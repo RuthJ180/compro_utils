@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+  echo "Usage: compro [command] arguments"
+  echo "Commands:"
+  echo "  make - download a compro_install_profile site"
+  exit 0
+fi
+
+$(compro-$@)

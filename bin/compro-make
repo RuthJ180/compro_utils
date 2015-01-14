@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+  echo "Usage: compro-make newprojectname"
+  exit 0
+fi
+
+NAME=${1:0:64}
+
+# Download Drupal and all required modules/themes/libraries.
+drush make https://bitbucket.org/alexfisher/compro_install_profile/raw/master/make/compro.make $NAME
