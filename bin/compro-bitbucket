@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Get custom configs.
+if [ -e ~/.compro ]; then
+  source ~/.compro
+fi
+
+if ! [ ${BITBUCKET_USER+_} ]; then
+  read -p "Enter your bitbucket username: " BITBUCKET_USER \n
+fi
+
+if ! [ ${BITBUCKET_PASS+_} ]; then
+  read -s -p "Enter your bitbucket password: " BITBUCKET_PASS \n
+fi
+
+# Create bitbucket repo.
+curl --user $BITBUCKET_USER:$BITBUCKET_PASS https://api.bitbucket.org/1.0/repositories/ --data name=$NAME --data is_private=true --data owner=alexfisher --data scm=git --data language=php
+
+# Set up remote origin and make first push.
+git remote add origin git@bitbucket.org:alexfisher/$NAME.git
+git push -u origin --all

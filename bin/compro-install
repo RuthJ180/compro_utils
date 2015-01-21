@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+MYSQL_USER=root
+
+# Get custom configs.
+if [ -e "~/.compro" ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "u:" OPTION
+do
+  case $OPTION in
+    u)
+      MYSQL_USER=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${MYSQL_PASS+_} ]; then
+  read -s -p "Enter the mysql password (for root unless -u flag used): " MYSQL_PASS \n
+fi
+
+# Install site into database using drush.
+drush site-install compro --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@localhost/$NAME --account-name=maintenance --account-pass=admin --site-name=$NAME

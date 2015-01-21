@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+if [ -z $1 ]; then
+  echo "Usage: compro-finish newprojectname"
+  exit 0
+fi
+
+NAME=${1:0:64}
+
+# Get custom configs.
+if [ -e "~/.compro" ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "t:" OPTION
+do
+  case $OPTION in
+    t)
+      LOCAL_EXT=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${LOCAL_EXT+_} ]; then
+  read -p "Enter dotless TLD for URL, or leave blank for none: " LOCAL_EXT \n
+fi
+
+if [ -z $LOCAL_EXT ]; then
+  echo Visit the new site @ http://$NAME
+else
+  echo Visit the new site @ http://$NAME.$LOCAL_EXT
+fi
+echo Username: maintenance
+echo Password: admin
+
+# Change settings.php permissions
+chmod 444 $NAME/sites/default/settings.php
+
+# @TODO: Do the find chmod thing?

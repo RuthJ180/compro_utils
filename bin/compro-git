@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Initial git commit.
+git init
+git config core.fileMode false
+git add .
+git commit -m "Initial commit"
+git branch -m master stage

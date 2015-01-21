@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Get custom configs.
+if [ -e "~/.compro" ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "i:p:s:t:" OPTION
+do
+  case $OPTION in
+    i)
+      NGINX_IP=$OPTARG
+      ;;
+    p)
+      FASTCGI_PASS=$OPTARG
+      ;;
+    s)
+      WEB_SERVER=$OPTARG
+      ;;
+    t)
+      LOCAL_EXT=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${LOCAL_EXT+_} ]; then
+  read -p "Enter dotless TLD for URL, or leave blank for none: " LOCAL_EXT \n
+fi
+
+# Reasonable default for where apache's sites go.
+if ! [ ${APACHE_SA+_} ]; then
+  APACHE_SA=/etc/apache2/sites-available
+fi
+
+# Reasonable default for PHP fastcgi.
+if ! [ ${FASTCGI_PASS+_} ]; then
+  FASTCGI_PASS="127.0.0.1:9000"
+fi
+
+# Reasonable default for the IP:port.
+if ! [ ${NGINX_IP+_} ]; then
+  NGINX_IP="127.0.0.1"
+fi
+
+# Reasonable default for where nginx's sites go.
+if ! [ ${NGINX_SA+_} ]; then
+  NGINX_SA=/etc/nginx/sites-available
+fi
+
+# Reasonable default for web server.
+if ! [ ${WEB_SERVER+_} ]; then
+  WEB_SERVER=nginx
+fi
+
+case $WEB_SERVER in
+  apache)
+    # Setup apache vhost.
+    sudo touch $APACHE_SA/$NAME.conf
+    echo Wrote the following to $APACHE_SA/$NAME.conf
+    echo "<VirtualHost *:80>" | sudo tee -a $APACHE_SA/$NAME.conf
+    if [ -z $LOCAL_EXT ]; then
+      echo "        ServerName "$NAME | sudo tee -a $APACHE_SA/$NAME.conf
+      echo "        ServerAlias *."$NAME | sudo tee -a $APACHE_SA/$NAME.conf
+    else
+      echo "        ServerName "$NAME.$LOCAL_EXT | sudo tee -a $APACHE_SA/$NAME.conf
+      echo "        ServerAlias *."$NAME.$LOCAL_EXT | sudo tee -a $APACHE_SA/$NAME.conf
+    fi
+    echo "        DirectoryIndex index.php index.html" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "        DocumentRoot "$(pwd) | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "        <Directory "$(pwd)">" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "                Options Indexes FollowSymLinks" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "                AllowOverride All" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "                Require all granted" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "        </Directory>" | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "        ErrorLog /var/log/apache2/"$NAME.local_error.log | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "        CustomLog /var/log/apache2/"$NAME.local_access.log combined | sudo tee -a $APACHE_SA/$NAME.conf
+    echo "</VirtualHost>" | sudo tee -a $APACHE_SA/$NAME.conf
+
+    echo Activating site...
+    sudo a2ensite $NAME
+    echo Done.
+
+    echo Restarting apache2...
+    sudo service apache2 restart
+    echo Done.
+    ;;
+  nginx)
+    # Setup nginx vhost.
+    sudo touch $NGINX_SA/$NAME
+    echo Writing the following to $NGINX_SA/$NAME
+    echo "server {" | sudo tee -a $NGINX_SA/$NAME
+    if [ -z $LOCAL_EXT ]; then
+      echo "  server_name "$NAME";" | sudo tee -a $NGINX_SA/$NAME
+    else
+      echo "  server_name "$NAME.$LOCAL_EXT";" | sudo tee -a $NGINX_SA/$NAME
+    fi
+    echo "  listen "$NGINX_IP":80;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  root "$(pwd)";" | sudo tee -a $NGINX_SA/$NAME
+    echo "  charset utf-8;" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location = /favicon.ico {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    log_not_found off;" | sudo tee -a $NGINX_SA/$NAME
+    echo "    access_log off;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location ~ \..*/.*\.php$ {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    return 403;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location / {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    try_files \$uri @rewrite;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location @rewrite {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    rewrite ^/(.*)$ /index.php?q=\$1;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location ~ \.php$ {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    fastcgi_split_path_info ^(.+\.php)(/.+)$;" | sudo tee -a $NGINX_SA/$NAME
+    echo "    include fastcgi_params;" | sudo tee -a $NGINX_SA/$NAME
+    echo "    fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" | sudo tee -a $NGINX_SA/$NAME
+    echo "    fastcgi_intercept_errors on;" | sudo tee -a $NGINX_SA/$NAME
+    echo "    fastcgi_pass "$FASTCGI_PASS";" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location ~ ^/sites/.*/files/imagecache/ {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    try_files \$uri @rewrite;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "  location ~ ^/sites/.*/files/styles/ {" | sudo tee -a $NGINX_SA/$NAME
+    echo "    try_files \$uri @rewrite;" | sudo tee -a $NGINX_SA/$NAME
+    echo "  }" | sudo tee -a $NGINX_SA/$NAME
+    echo "}" | sudo tee -a $NGINX_SA/$NAME
+
+    echo Activating site...
+    sudo ln -s $NGINX_SA/$NAME $NGINX_SE/$NAME
+    echo Done.
+
+    echo Restarting nginx...
+    sudo service nginx restart
+    echo Done.
+    ;;
+esac
+

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Get custom configs.
+if [ -e "~/.compro" ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "i:t:" OPTION
+do
+  case $OPTION in
+  	i)
+	  NGINX_IP=$OPTARG
+	  ;;
+    t)
+      LOCAL_EXT=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${LOCAL_EXT+_} ]; then
+  read -p "Enter dotless TLD for URL, or leave blank for none: " LOCAL_EXT \n
+fi
+
+# Reasonable default for the IP:port.
+if ! [ ${NGINX_IP+_} ]; then
+  NGINX_IP="127.0.0.1"
+fi
+
+# Add hosts entry.
+echo Adding vhost entry to hosts file...
+if [ -z $LOCAL_EXT ]; then
+  echo $NGINX_IP"  "$NAME | sudo tee -a /etc/hosts
+else
+  echo $NGINX_IP"  "$NAME.$LOCAL_EXT | sudo tee -a /etc/hosts
+fi
+echo Done.

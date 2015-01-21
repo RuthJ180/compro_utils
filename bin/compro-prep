@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+
+# Create files directory.
+if ! [ -d sites/default/files ]; then
+  echo "Creating files directory..."
+  mkdir sites/default/files
+  chmod 777 sites/default/files
+fi
+
+# Create settings.php file.
+if ! [ -e sites/default/settings.php ]; then
+  echo "Creating settings.php file..."
+  cp sites/default/default.settings.php sites/default/settings.php
+  chmod 777 sites/default/settings.php
+fi

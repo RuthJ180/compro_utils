@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+if [ -z $1 ]; then
+  echo "Usage: compro-site newprojectname"
+  exit 0
+fi
+
+NAME=${1:0:64}
+
+# Run all the commands in order.
+compro-make $NAME
+
+cd $NAME
+compro-alias
+compro-prep
+compro-db
+compro-install
+compro-server
+compro-hosts
+compro-git
+compro-bitbucket
+
+cd ..
+compro-finish $NAME
+exit 0
