@@ -3,7 +3,16 @@
 if [ -z $1 ]; then
   echo "Usage: compro [command] arguments"
   echo "Commands:"
-  echo "  make - download a compro_install_profile site"
+  echo "  alias     - Add a drush alias to a site"
+  echo "  bitbucket - Create/push a bitbucket repo"
+  echo "  db        - Create a mysql db for a site"
+  echo "  fs        - Set sensible file permissions"
+  echo "  git       - init and commit to a git repo"
+  echo "  hosts     - Add the site to the hosts file"
+  echo "  install   - install a site with drush"
+  echo "  make      - download compro_install_profile"
+  echo "  prep      - create sites/default stuff"
+  echo "  server    - Add virtualhost to web server"
   exit 0
 fi
 

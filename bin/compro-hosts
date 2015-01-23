@@ -10,7 +10,7 @@ set -o nounset
 NAME=${PWD##*/}
 
 # Get custom configs.
-if [ -e "~/.compro" ]; then
+if [ -e ~/.compro ]; then
   source ~/.compro
 fi
 
@@ -38,9 +38,9 @@ fi
 
 # Add hosts entry.
 echo Adding vhost entry to hosts file...
-if [ -z $LOCAL_EXT ]; then
-  echo $NGINX_IP"  "$NAME | sudo tee -a /etc/hosts
+if [ -z ${LOCAL_EXT} ]; then
+  echo ${NGINX_IP}"  "${NAME} | sudo tee -a /etc/hosts
 else
-  echo $NGINX_IP"  "$NAME.$LOCAL_EXT | sudo tee -a /etc/hosts
+  echo ${NGINX_IP}"  "${NAME}.${LOCAL_EXT} | sudo tee -a /etc/hosts
 fi
 echo Done.

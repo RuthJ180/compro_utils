@@ -12,19 +12,36 @@ fi
 
 NAME=${1:0:64}
 
-# Run all the commands in order.
-compro-make $NAME
+BITBUCKET=1
+# Allow flag to override config.
+while getopts "b" OPTION
+do
+  case $OPTION in
+    b)
+      BITBUCKET=0
+      ;;
+  esac
+done
 
-cd $NAME
+# Run all the commands in order.
+compro-make ${NAME}
+
+cd ${NAME}
 compro-alias
 compro-prep
 compro-db
 compro-install
+compro-fs
 compro-server
 compro-hosts
 compro-git
-compro-bitbucket
 
+if [ ${BITBUCKET} > 0 ]; then
+  compro-bitbucket
+fi
+
+# Finish up.
+drush @${NAME}.dev-${USER} uli maintenance /
 cd ..
-compro-finish $NAME
+echo "Done."
 exit 0

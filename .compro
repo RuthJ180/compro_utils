@@ -1,6 +1,6 @@
 
 # Directory for available sites in apache (if applicable)
-APACHE_SA=/etc/apache2/sites-available
+APACHE_SA='/etc/apache2/sites-available'
 
 # Your bitbucket password (Be sure to set permissions on this file)
 BITBUCKET_PASS="password"
@@ -15,16 +15,16 @@ FASTCGI_PASS="127.0.0.1:9000"
 LOCAL_EXT="local"
 
 # Your MySQL root password.
-MYSQL_PASS=password
+MYSQL_PASS='password'
 
 # Localhost IP that nginx should listen on.
 NGINX_IP="127.0.0.2"
 
 # Directory for available sites in nginx (if applicable)
-NGINX_SA=/etc/nginx/sites-available
+NGINX_SA='/etc/nginx/sites-available'
 
 # Directory for enabled sites in nginx (if applicable)
-NGINX_SE=/etc/nginx/sites-enabled
+NGINX_SE='/etc/nginx/sites-enabled'
 
 # Which webserver to use.
-WEB_SERVER=nginx
+WEB_SERVER='nginx'

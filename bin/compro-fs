@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+find . -type f -print0 | xargs -I {} -0 chmod 0644 {}
+find . -type d -print0 | xargs -I {} -0 chmod 0755 {}

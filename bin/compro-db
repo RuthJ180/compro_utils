@@ -11,7 +11,7 @@ NAME=${PWD##*/}
 MYSQL_USER=root
 
 # Get custom configs.
-if [ -e "~/.compro" ]; then
+if [ -e ~/.compro ]; then
   source ~/.compro
 fi
 
@@ -30,4 +30,4 @@ if ! [ ${MYSQL_PASS+_} ]; then
 fi
 
 # Create database.
-mysql -u$MYSQL_USER -p$MYSQL_PASS -e "create database $NAME"
+mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "create database ${NAME}"

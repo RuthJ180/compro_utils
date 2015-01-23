@@ -10,7 +10,7 @@ set -o nounset
 NAME=${PWD##*/}
 
 # Get custom configs.
-if [ -e "~/.compro" ]; then
+if [ -e ~/.compro ]; then
   source ~/.compro
 fi
 
@@ -32,16 +32,15 @@ fi
 mkdir sites/all/drush
 touch sites/all/drush/$NAME.aliases.drushrc.php
 echo "Creating drush alias file..."
-echo "<?php" >> sites/all/drush/$NAME.aliases.drushrc.php
-echo "" >> sites/all/drush/$NAME.aliases.drushrc.php
+echo "<?php" >> sites/all/drush/${NAME}.aliases.drushrc.php
+echo "" >> sites/all/drush/${NAME}.aliases.drushrc.php
+echo "\$aliases['dev-"${USER}"'] = array(" >> sites/all/drush/$NAME.aliases.drushrc.php
 
-if [ -z $LOCAL_EXT ]; then
-  echo "\$aliases['dev-"$USER"'] = array(" >> sites/all/drush/$NAME.aliases.drushrc.php
-  echo "  'uri' => '"$NAME"'," >> sites/all/drush/$NAME.aliases.drushrc.php
+if [ -z ${LOCAL_EXT} ]; then
+  echo "  'uri' => '"${NAME}"'," >> sites/all/drush/${NAME}.aliases.drushrc.php
 else
-  echo "\$aliases['"$LOCAL_EXT"-"$USER"'] = array(" >> sites/all/drush/$NAME.aliases.drushrc.php
-  echo "  'uri' => '"$NAME"."$LOCAL_EXT"'," >> sites/all/drush/$NAME.aliases.drushrc.php
+  echo "  'uri' => '"${NAME}"."${LOCAL_EXT}"'," >> sites/all/drush/${NAME}.aliases.drushrc.php
 fi
 
-echo "  'root' => '"$(pwd)"'," >> sites/all/drush/$NAME.aliases.drushrc.php
-echo ");" >> sites/all/drush/$NAME.aliases.drushrc.php
+echo "  'root' => '"$(pwd)"'," >> sites/all/drush/${NAME}.aliases.drushrc.php
+echo ");" >> sites/all/drush/${NAME}.aliases.drushrc.php
