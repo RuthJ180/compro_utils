@@ -16,4 +16,5 @@ if [ -z $1 ]; then
   exit 0
 fi
 
-$(compro-$@)
+# Not super happy about this.
+eval 'compro-'"$@"
