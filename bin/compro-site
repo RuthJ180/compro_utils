@@ -5,23 +5,25 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
-if [ -z $1 ]; then
-  echo "Usage: compro-site newprojectname"
-  exit 0
-fi
+NAME=''
+BITBUCKET=0
 
-NAME=${1:0:64}
-
-BITBUCKET=1
 # Allow flag to override config.
 while getopts "b" OPTION
 do
   case $OPTION in
     b)
-      BITBUCKET=0
+      BITBUCKET=1
       ;;
   esac
 done
+
+NAME=${@:$OPTIND:1}
+
+if [ -z "$NAME" ]; then
+  echo "Usage: compro-site -options newprojectname"
+  exit 1
+fi
 
 # Run all the commands in order.
 compro-make ${NAME}
@@ -36,7 +38,7 @@ compro-server
 compro-hosts
 compro-git
 
-if [ ${BITBUCKET} > 0 ]; then
+if [ $BITBUCKET = 1 ]; then
   compro-bitbucket
 fi
 
