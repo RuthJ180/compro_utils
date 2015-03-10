@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Allow flag to override config.
+while getopts "p:t:" OPTION
+do
+  case $OPTION in
+  	p)
+      PREFIX=$OPTARG
+      ;;
+    t)
+      CTYPE=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${PREFIX+_} ]; then
+  PREFIX=$NAME
+fi
+
+if ! [ ${CTYPE+_} ]; then
+  read -p "Enter machine name for content type: " CTYPE \n
+fi
+
+# If this returns the right name, we're in business.
+echo ${PREFIX}'_'${CTYPE}
+
+# Check if a module of this name already exists on the site.
+
+# Determine correct destination (sites/all/modules/features ideally).
+DESTINATION='sites/all/modules'
+# @pseudo: if dir 'sites/all/modules/features' exists && file 
+#   'sites/all/modules/features/features.info' does not exist
+#   DESTINATION='sites/all/modules/features'
+
+# Download fprefix_ctype to destination dir.
+# @pseudo git clone https://ao5357@bitbucket.org/alexfisher/fprefix_ctype.git ${DESTINATION}/${PREFIX}'_'${CTYPE}
+
+# Replace fprefix_ctype with the user-supplied values (in files).
+
+# Change filenames accordingly.
+
+# Change root feature name.
+
+# Enable the newly-created feature.
