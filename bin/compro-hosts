@@ -18,9 +18,9 @@ fi
 while getopts "i:t:" OPTION
 do
   case $OPTION in
-  	i)
-	  NGINX_IP=$OPTARG
-	  ;;
+    i)
+      NGINX_IP=$OPTARG
+      ;;
     t)
       LOCAL_EXT=$OPTARG
       ;;

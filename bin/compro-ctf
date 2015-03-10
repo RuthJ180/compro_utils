@@ -53,7 +53,6 @@ find "${DESTINATION}/${FNAME}" -type f -print0 | xargs -0 sed -i "s/fprefix/${PR
 find "${DESTINATION}/${FNAME}" -type f -print0 | xargs -0 sed -i "s/ctype/${CTYPE}/g"
 
 # Change filenames accordingly.
-# find "${DESTINATION}/${FNAME}" -type f -execdir bash -c 'mv -i "$1" "${1//fprefix_ctype/$FNAME}"' bash {} \;
 cd "${DESTINATION}/${FNAME}"
 ls | sed -e "p;s/fprefix_ctype/${FNAME}/" | xargs -n2 mv
 

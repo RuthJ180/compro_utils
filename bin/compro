@@ -5,6 +5,7 @@ if [ -z $1 ]; then
   echo "Commands:"
   echo "  alias     - Add a drush alias to a site"
   echo "  bitbucket - Create/push a bitbucket repo"
+  echo "  ctf       - Generate a feature for content"
   echo "  db        - Create a mysql db for a site"
   echo "  fs        - Set sensible file permissions"
   echo "  git       - init and commit to a git repo"
