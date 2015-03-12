@@ -9,6 +9,7 @@ set -o nounset
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
 MYSQL_USER=root
+INSTALL=true
 
 # Get custom configs.
 if [ -e ~/.compro ]; then
@@ -16,11 +17,14 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "u:" OPTION
+while getopts "u:x" OPTION
 do
   case $OPTION in
     u)
       MYSQL_USER=$OPTARG
+      ;;
+    x)
+      INSTALL=false
       ;;
   esac
 done
@@ -30,4 +34,10 @@ if ! [ ${MYSQL_PASS+_} ]; then
 fi
 
 # Create database.
-mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "create database ${NAME}"
+if [ "$INSTALL" = false ]; then
+  echo "Dropping database ${NAME}"
+  mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "drop database ${NAME}" && echo "Done."
+else
+  echo "Creating database ${NAME}"
+  mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "create database ${NAME}" && echo "Done."
+fi

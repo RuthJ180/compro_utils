@@ -7,13 +7,17 @@ set -o nounset
 
 NAME=''
 BITBUCKET=0
+INSTALL=true
 
 # Allow flag to override config.
-while getopts "b" OPTION
+while getopts "bx" OPTION
 do
   case $OPTION in
     b)
       BITBUCKET=1
+      ;;
+    x)
+      INSTALL=false
       ;;
   esac
 done
@@ -21,11 +25,29 @@ done
 NAME=${@:$OPTIND:1}
 
 if [ -z "$NAME" ]; then
-  echo "Usage: compro-site -options newprojectname"
+  echo "Usage: compro-site -options projectname"
   exit 1
 fi
 
-# Run all the commands in order.
+# Uninstall a whole site (ideally not erroring out if partially uninstalled)
+if [ "$INSTALL" = false ]; then
+  if [ -d ${NAME} ]; then
+    echo "Uninstalling site ${NAME}"
+    cd ${NAME}
+    drush archive-dump || true
+    compro-db -x || true
+    compro-server -x || true
+    compro-hosts -x
+    cd ..
+    sudo rm -rf ${NAME}
+    exit 0
+  else
+    echo "No site of that name exists in this directory."
+    exit 1
+  fi
+fi
+
+# Install a site. Run all the commands in order.
 compro-make ${NAME}
 
 cd ${NAME}

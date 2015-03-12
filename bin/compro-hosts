@@ -8,6 +8,7 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
+INSTALL=true
 
 # Get custom configs.
 if [ -e ~/.compro ]; then
@@ -15,7 +16,7 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "i:t:" OPTION
+while getopts "i:t:x" OPTION
 do
   case $OPTION in
     i)
@@ -23,6 +24,9 @@ do
       ;;
     t)
       LOCAL_EXT=$OPTARG
+      ;;
+    x)
+      INSTALL=false
       ;;
   esac
 done
@@ -37,10 +41,17 @@ if ! [ ${NGINX_IP+_} ]; then
 fi
 
 # Add hosts entry.
-echo Adding vhost entry to hosts file...
-if [ -z ${LOCAL_EXT} ]; then
-  echo ${NGINX_IP}"  "${NAME} | sudo tee -a /etc/hosts
+if [ "$INSTALL" = false ]; then
+  echo "Removing ${NAME} from /etc/hosts"
+  # @TODO: make pattern space-string-dot to ensure deletes aren't greedy
+  sudo sed -i "/${NAME}/d" /etc/hosts
 else
-  echo ${NGINX_IP}"  "${NAME}.${LOCAL_EXT} | sudo tee -a /etc/hosts
+  echo Adding vhost entry to hosts file...
+  if [ -z ${LOCAL_EXT} ]; then
+    echo ${NGINX_IP}"  "${NAME} | sudo tee -a /etc/hosts
+  else
+    echo ${NGINX_IP}"  "${NAME}.${LOCAL_EXT} | sudo tee -a /etc/hosts
+  fi
 fi
+
 echo Done.

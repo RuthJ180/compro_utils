@@ -8,6 +8,7 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
+INSTALL=true
 
 # Get custom configs.
 if [ -e ~/.compro ]; then
@@ -15,7 +16,7 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "i:p:s:t:" OPTION
+while getopts "i:p:s:t:x" OPTION
 do
   case ${OPTION} in
     i)
@@ -30,10 +31,13 @@ do
     t)
       LOCAL_EXT=${OPTARG}
       ;;
+    x)
+      INSTALL=false
+      ;;
   esac
 done
 
-if ! [ ${LOCAL_EXT+_} ]; then
+if ! [ ${LOCAL_EXT+_} ] && [ "$INSTALL" = true ]; then
   read -p "Enter dotless TLD for URL, or leave blank for none: " LOCAL_EXT \n
 fi
 
@@ -67,6 +71,30 @@ if ! [ ${WEB_SERVER+_} ]; then
   WEB_SERVER='nginx'
 fi
 
+# To uninstall a site ('x' flag)
+if [ "$INSTALL" = false ]; then
+  case ${WEB_SERVER} in
+    apache)
+      echo "Removing apache server for ${NAME}"
+      sudo a2dissite ${NAME}
+      echo "Restarting apache..."
+      sudo service apache2 restart
+      sudo rm ${APACHE_SA}/${NAME}.conf
+      ;;
+    nginx)
+      echo "Removing nginx server for ${NAME}"
+      sudo rm ${NGINX_SE}/${NAME}
+      echo "Restarting nginx..."
+      sudo service nginx restart
+      sudo rm ${NGINX_SA}/${NAME}
+      ;;
+  esac
+
+  echo "Done."
+  exit 0
+fi
+
+# To install a site
 case ${WEB_SERVER} in
   apache)
     # Setup apache vhost.
