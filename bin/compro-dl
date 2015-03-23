@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+DESTINATION=''
+DL=${@:$OPTIND:1}
+
+# Options (Note: add themes and features to list below too)
+if [ -z "${DL}" ]; then
+  options=(
+    compro_adminimal
+    compro_content 
+    compro_credit 
+    compro_custom
+    compro_homebox
+    compro_mail
+    compro_paragraphs
+    contact_info 
+    display_text_formats
+    field_collection_delta_display
+    field_collection_image_link_parent
+    fprefix_ctype
+    get_arguments 
+    list_text_filter 
+    node_iframe 
+    onepage_feature 
+    onepage_theme 
+    smush_text_filter 
+    stiff_drink
+    temple 
+  )
+
+  select opt in "${options[@]}"
+  do
+    case $opt in
+      *) 
+        DL=$opt
+        break
+        ;;
+    esac
+  done
+fi
+
+# Determine where we should put the downloaded repo.
+if [ -d 'sites/all/modules' ]; then
+  DESTINATION='sites/all/modules/'
+fi
+
+# Custom modules
+if [ -d 'sites/all/modules/custom' ] && [ ! -e 'sites/all/modules/custom/custom.info' ]; then
+  DESTINATION='sites/all/modules/custom/'
+fi
+
+# Features
+FEATURES="compro_content compro_homebox compro_paragraphs fprefix_ctype onepage_feature"
+if [[ $FEATURES =~ $DL ]] && [ -d 'sites/all/modules/features' ] && [ ! -e 'sites/all/modules/features/features.info' ]; then
+  DESTINATION='sites/all/modules/features/'
+fi
+
+# Themes
+THEMES="compro_adminimal compro_mail onepage_theme stiff_drink temple"
+if [[ $THEMES =~ $DL ]] && [ -d 'sites/all/themes' ]; then
+  DESTINATION='sites/all/themes/'
+fi
+
+# Download DL to the destination dir
+git clone git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
+rm -rf ${DESTINATION}${DL}/.git
