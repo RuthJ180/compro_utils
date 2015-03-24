@@ -12,26 +12,26 @@ DL=${@:$OPTIND:1}
 if [ -z "${DL}" ]; then
   options=(
     compro_adminimal
-    compro_content 
-    compro_credit 
+    compro_content
+    compro_credit
     compro_custom
     compro_homebox
     compro_mail
     compro_paragraphs
     compro_search
-    contact_info 
+    contact_info
     display_text_formats
     field_collection_delta_display
     field_collection_image_link_parent
     fprefix_ctype
-    get_arguments 
-    list_text_filter 
-    node_iframe 
-    onepage_feature 
-    onepage_theme 
-    smush_text_filter 
+    get_arguments
+    list_text_filter
+    node_iframe
+    onepage_feature
+    onepage_theme
+    smush_text_filter
     stiff_drink
-    temple 
+    temple
   )
 
   select opt in "${options[@]}"
