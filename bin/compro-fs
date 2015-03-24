@@ -9,5 +9,5 @@ find . -type f -print0 | xargs -I {} -0 chmod 0644 {}
 find . -type d -print0 | xargs -I {} -0 chmod 0755 {}
 
 if [ -d sites/default/files ]; then
-  chmod -R 775 sites/default/files
+  chmod 777 sites/default/files
 fi
