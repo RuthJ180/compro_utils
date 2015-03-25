@@ -27,4 +27,4 @@ NGINX_SA='/etc/nginx/sites-available'
 NGINX_SE='/etc/nginx/sites-enabled'
 
 # Which webserver to use.
-WEB_SERVER='nginx'
+WEB_SERVER='apache'
