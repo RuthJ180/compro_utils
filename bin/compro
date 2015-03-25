@@ -7,7 +7,6 @@ if [ -z $1 ]; then
   echo "  bitbucket - Create/push a bitbucket repo"
   echo "  ctf       - Generate a feature for content"
   echo "  db        - Create a mysql db for a site"
-  echo "  dl        - Download bitbucket repos"
   echo "  fs        - Set sensible file permissions"
   echo "  git       - init and commit to a git repo"
   echo "  hosts     - Add the site to the hosts file"
@@ -15,7 +14,7 @@ if [ -z $1 ]; then
   echo "  make      - download compro_install_profile"
   echo "  prep      - create sites/default stuff"
   echo "  server    - Add virtualhost to web server"
-  exit 1
+  exit 0
 fi
 
 # Not super happy about this.
