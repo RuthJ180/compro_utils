@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# Check to ensure we're in the site root.
+if [ ! -d 'sites/all/modules' ]; then
+  echo "Must be executed from the root of a Drupal site."
+  exit 1
+fi
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+
+# Allow flag to override config.
+while getopts "p:t:" OPTION
+do
+  case $OPTION in
+  	p)
+      PREFIX=$OPTARG
+      ;;
+    t)
+      TTYPE=$OPTARG
+      ;;
+  esac
+done
+
+if ! [ ${PREFIX+_} ]; then
+  PREFIX=$NAME
+fi
+
+if ! [ ${TTYPE+_} ]; then
+  read -p "Enter machine name for taxonomy vocabulary: " TTYPE \n
+fi
+
+# Determine correct destination (sites/all/modules/features ideally).
+DESTINATION='sites/all/modules'
+
+if [ -d 'sites/all/modules/features' ] && [ ! -e 'sites/all/modules/features/features.info' ]; then
+  DESTINATION='sites/all/modules/features'
+fi
+
+# Download fprefix_ttype to destination dir.
+FNAME=${PREFIX}'_'${TTYPE}
+git clone git@bitbucket.org:alexfisher/fprefix_ttype.git ${DESTINATION}/${FNAME}
+rm -rf ${DESTINATION}/${FNAME}/.git
+
+# Replace fprefix and ttype with the user-supplied values (in files).
+find "${DESTINATION}/${FNAME}" -type f -print0 | xargs -0 sed -i "s/fprefix/${PREFIX}/g"
+find "${DESTINATION}/${FNAME}" -type f -print0 | xargs -0 sed -i "s/ttype/${TTYPE}/g"
+
+# Change filenames accordingly.
+cd "${DESTINATION}/${FNAME}"
+ls | sed -e "p;s/fprefix_ttype/${FNAME}/" | xargs -n2 mv
+
+# Enable the newly-created feature.
+drush en ${FNAME}
