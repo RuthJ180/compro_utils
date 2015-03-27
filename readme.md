@@ -29,6 +29,15 @@ Create a mysql db for a site. Prompts if defaults aren't set in ~/.compro
 
 **-u** lets you set the MySQL user
 
+### dl
+
+Download resources from bitbucket.org/alexfisher and put them in an appropriate 
+directory.
+
+### ebf
+
+Create a feature containing an ECK entity type, bundle, and a view.
+
 ### fs
 
 Set sensible file permissions (644 for files, 755 for directories).
@@ -77,6 +86,10 @@ Run most of the other commands and initialize a whole site.
  > Usage: compro-site -options newprojectname
 
 **-b** runs compro-bitbucket in the process
+
+### tvf
+
+Create a feature containing a taxonomy vocabulary and a view.
 
 ## Install
 

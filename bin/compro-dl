@@ -24,6 +24,8 @@ if [ -z "${DL}" ]; then
     field_collection_delta_display
     field_collection_image_link_parent
     fprefix_ctype
+    fprefix_etype
+    fprefix_ttype
     get_arguments
     list_text_filter
     node_iframe
@@ -56,7 +58,7 @@ if [ -d 'sites/all/modules/custom' ] && [ ! -e 'sites/all/modules/custom/custom.
 fi
 
 # Features
-FEATURES="compro_content compro_homebox compro_paragraphs fprefix_ctype onepage_feature compro_search"
+FEATURES="compro_content compro_homebox compro_paragraphs fprefix_ctype fprefix_etype fprefix_ttype onepage_feature compro_search"
 if [[ $FEATURES =~ $DL ]] && [ -d 'sites/all/modules/features' ] && [ ! -e 'sites/all/modules/features/features.info' ]; then
   DESTINATION='sites/all/modules/features/'
 fi
