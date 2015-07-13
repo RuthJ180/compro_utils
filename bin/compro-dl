@@ -7,30 +7,32 @@ set -o nounset
 
 DESTINATION=''
 DL=${@:$OPTIND:1}
+CORE=$(compro-coreversion)
 
 # Options (Note: add themes and features to list below too)
 if [ -z "${DL}" ]; then
   options=(
-    compro_adminimal
+    compro_bg_image
     compro_content
     compro_credit
     compro_custom
+    compro_highlight
     compro_homebox
     compro_mail
     compro_paragraphs
     compro_search
+    compro_stats
     contact_info
     display_text_formats
     field_collection_delta_display
     field_collection_image_link_parent
-    fprefix_ctype
-    fprefix_etype
-    fprefix_ttype
     get_arguments
+    label_maker
     list_text_filter
     node_iframe
     onepage_feature
     onepage_theme
+    paragraphs_formatters
     smush_text_filter
     stiff_drink
     temple
@@ -52,15 +54,30 @@ if [ -d 'sites/all/modules' ]; then
   DESTINATION='sites/all/modules/'
 fi
 
+# Put d8 modules in root modules folder.
+if [ ${CORE} == "8" ]; then
+  DESTINATION='modules/'
+fi
+
 # Custom modules
 if [ -d 'sites/all/modules/custom' ] && [ ! -e 'sites/all/modules/custom/custom.info' ]; then
   DESTINATION='sites/all/modules/custom/'
 fi
 
+# d8 Custom modules
+if [ -d 'modules/custom' ] && [ ! -e 'modules/custom/custom.info.yml' ]; then
+  DESTINATION='modules/custom/'
+fi
+
 # Features
-FEATURES="compro_content compro_homebox compro_paragraphs fprefix_ctype fprefix_etype fprefix_ttype onepage_feature compro_search"
+FEATURES="compro_content compro_highlight compro_homebox compro_paragraphs fprefix_ctype fprefix_etype fprefix_ttype onepage_feature compro_search"
 if [[ $FEATURES =~ $DL ]] && [ -d 'sites/all/modules/features' ] && [ ! -e 'sites/all/modules/features/features.info' ]; then
   DESTINATION='sites/all/modules/features/'
+fi
+
+# d8 Features
+if [[ $FEATURES =~ $DL ]] && [ -d 'modules/features' ] && [ ! -e 'modules/features/features.info.yml' ]; then
+  DESTINATION='modules/features/'
 fi
 
 # Themes
@@ -69,6 +86,27 @@ if [[ $THEMES =~ $DL ]] && [ -d 'sites/all/themes' ]; then
   DESTINATION='sites/all/themes/'
 fi
 
+# d8 Themes
+if [[ $THEMES =~ $DL ]] && [ ${CORE} == "8" ]; then
+  DESTINATION='themes/'
+fi
+
 # Download DL to the destination dir
-git clone git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
-rm -rf ${DESTINATION}${DL}/.git
+if [ ${CORE} == "8" ]; then
+  # Find a branch that starts with the core version number.
+  BRANCH=$(git ls-remote --heads git@bitbucket.org:alexfisher/${DL}.git | cut -c53- | grep -P '^8' | head -n1 || echo 'notabranch')
+
+  if [ ${BRANCH} == 'notabranch' ]; then
+    # Allow d7 repos, for dev purposes.
+    echo "Warning: Drupal 7 version of module"
+    git clone git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
+  else
+    echo "Cloning from branch ${BRANCH}"
+    git clone -b ${BRANCH} git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
+  fi
+
+  rm -rf ${DESTINATION}${DL}/.git
+else
+  git clone git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
+  rm -rf ${DESTINATION}${DL}/.git
+fi
