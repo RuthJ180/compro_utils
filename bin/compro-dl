@@ -9,6 +9,16 @@ DESTINATION=''
 DL=${@:$OPTIND:1}
 CORE=$(compro-coreversion)
 
+# Allow flag to override config.
+while getopts "g:" OPTION
+do
+  case $OPTION in
+    g)
+      BRANCH="$OPTARG"
+      ;;
+  esac
+done
+
 # Options (Note: add themes and features to list below too)
 if [ -z "${DL}" ]; then
   options=(
