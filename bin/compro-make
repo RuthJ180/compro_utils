@@ -10,7 +10,24 @@ if [ -z $1 ]; then
   exit 0
 fi
 
-NAME=${1:0:64}
+BRANCH="master"
+
+# Allow flag to override config.
+while getopts "g:" OPTION
+do
+  case $OPTION in
+    g)
+      BRANCH="$OPTARG"
+      ;;
+  esac
+done
+
+NAME=${@:$OPTIND:1}
 
 # Download Drupal and all required modules/themes/libraries.
-drush make https://bitbucket.org/alexfisher/compro_install_profile/raw/master/make/compro.make ${NAME}
+
+if [ ${BRANCH:0:1} == "8" ]; then
+  drush make --no-cache "https://bitbucket.org/alexfisher/compro_install_profile/raw/${BRANCH}/compro.make" ${NAME}
+else
+  drush make "https://bitbucket.org/alexfisher/compro_install_profile/raw/${BRANCH}/make/compro.make" ${NAME}
+fi

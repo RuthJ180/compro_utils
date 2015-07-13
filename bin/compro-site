@@ -19,13 +19,18 @@ EOF
 NAME=''
 BITBUCKET=0
 INSTALL=true
+BRANCH='master'
+CORE='7'
 
 # Allow flag to override config.
-while getopts "bx" OPTION
+while getopts "bg:x" OPTION
 do
   case $OPTION in
     b)
       BITBUCKET=1
+      ;;
+    g)
+      BRANCH="$OPTARG"
       ;;
     x)
       INSTALL=false
@@ -34,6 +39,11 @@ do
 done
 
 NAME=${@:$OPTIND:1}
+
+# Check if we should assume d8
+if [ ${BRANCH:0:1} == "8" ]; then
+  CORE='8'
+fi
 
 if [ -z "$NAME" ]; then
   echo "Usage: compro-site -options projectname"
@@ -59,10 +69,10 @@ if [ "$INSTALL" = false ]; then
 fi
 
 # Install a site. Run all the commands in order.
-compro-make ${NAME}
+compro-make -g ${BRANCH} ${NAME}
 
 cd ${NAME}
-compro-alias
+compro-alias -c ${CORE}
 compro-prep
 compro-db
 compro-install
