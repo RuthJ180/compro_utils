@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+PROJECT=${@:$OPTIND:1}
+
+BRANCHES=( $(git ls-remote --heads git@bitbucket.org:alexfisher/${PROJECT}.git | cut -c53-) )
+BRANCH=''
+
+if [ ${#BRANCHES[@]} == 1 ]; then
+  BRANCH=${BRANCHES[0]}
+else
+  select opt in "${BRANCHES[@]}"
+  do
+    case $opt in
+      *) 
+        BRANCH=$opt
+        break
+        ;;
+    esac
+  done
+fi
+
+echo "${BRANCH}"

@@ -19,8 +19,7 @@ EOF
 NAME=''
 BITBUCKET=0
 INSTALL=true
-BRANCH='master'
-CORE='7'
+BRANCH=''
 
 # Allow flag to override config.
 while getopts "bg:x" OPTION
@@ -40,9 +39,9 @@ done
 
 NAME=${@:$OPTIND:1}
 
-# Check if we should assume d8
-if [ ${BRANCH:0:1} == "8" ]; then
-  CORE='8'
+# Determine the correct branch.
+if [ "$INSTALL" == true ] && [ ${#BRANCH} == 0 ]; then
+  BRANCH=$(compro-branches compro_install_profile)
 fi
 
 if [ -z "$NAME" ]; then
@@ -51,7 +50,7 @@ if [ -z "$NAME" ]; then
 fi
 
 # Uninstall a whole site (ideally not erroring out if partially uninstalled)
-if [ "$INSTALL" = false ]; then
+if [ "$INSTALL" == false ]; then
   if [ -d ${NAME} ]; then
     echo "Uninstalling site ${NAME}"
     cd ${NAME}
@@ -72,7 +71,7 @@ fi
 compro-make -g ${BRANCH} ${NAME}
 
 cd ${NAME}
-compro-alias -c ${CORE}
+compro-alias
 compro-prep
 compro-db
 compro-install

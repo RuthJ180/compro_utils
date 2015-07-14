@@ -8,7 +8,7 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
-CORE='7'
+CORE=$(compro-coreversion)
 SITES='all'
 
 # Get custom configs.
@@ -17,12 +17,9 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "c:t:" OPTION
+while getopts "t:" OPTION
 do
   case $OPTION in
-    c)
-      CORE="$OPTARG"
-      ;;
     t)
       LOCAL_EXT="$OPTARG"
       ;;
