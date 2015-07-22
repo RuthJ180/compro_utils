@@ -5,5 +5,5 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
-COREVERSION=$(drush status | grep -oP 'Drupal version.*?\:  ([\d])\.' | rev | cut -c2 || echo '0')
+COREVERSION=$(drush status | grep -o 'Drupal version.*\.' | rev | cut -c2 || echo '0')
 echo "${COREVERSION}"
