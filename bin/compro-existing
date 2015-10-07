@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+NAME=''
+BRANCH=''
+
+# Allow flag to override config.
+while getopts "bg:x" OPTION
+do
+  case $OPTION in
+    g)
+      BRANCH="$OPTARG"
+      ;;
+  esac
+done
+
+NAME=${@:$OPTIND:1}
+
+if [ -z "$NAME" ]; then
+  echo "Usage: compro-site -options projectname"
+  exit 1
+fi
+
+# Determine the correct branch.
+if [ "$INSTALL" == true ] && [ ${#BRANCH} == 0 ]; then
+  BRANCH=$(compro-branches $NAME)
+fi
+
+# Install a local copy of an existing site.
+
+# Determine the desired branch to base it on.
+# Pull the repo down into a dir named $NAME
+# Logic to determine whether server and hosts should run.
+# Make a database to hold the sync.
+# Prep sites directories.
+# Make a settings.php file (with the flags and stuff).
+# Make aliases (This is the point where I'm beginning to consider making this a separate script)
+# Sync from a chosen alias (a parameter?)
+# Flush the caches
+# uli
+
+echo "Done."
+exit 0
