@@ -16,6 +16,7 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
+# @TODO add a flag for using drush runserver instead of nginx/apache.
 while getopts "i:p:s:t:x" OPTION
 do
   case ${OPTION} in
