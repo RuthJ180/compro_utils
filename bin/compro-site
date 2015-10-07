@@ -71,10 +71,10 @@ fi
 compro-make -g ${BRANCH} ${NAME}
 
 cd ${NAME}
-compro-alias
 compro-prep
 compro-db
 compro-install
+compro-alias || true
 compro-fs
 compro-server
 compro-hosts
