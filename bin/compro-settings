@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+MYSQL_USER='root'
+
+# Get custom configs.
+if [ -e ~/.compro ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "u:" OPTION
+do
+  case $OPTION in
+    u)
+      MYSQL_USER=$OPTARG
+      ;;
+  esac
+done
+
+# Download local.settings.php from bitbucket to sites/default/settings.php
+curl -o sites/default/settings.php https://bitbucket.org/alexfisher/compro_config/raw/master/local.settings.php
+
+# Replace the DBNAME placeholder.
+sed -i "s/DBNAME/${NAME}/g" sites/default/settings.php 
+
+# In case we don't have a MYSQL_PASS from the configs.
+if ! [ ${MYSQL_PASS+_} ]; then
+  read -s -p "Enter the mysql password (for root unless -u flag used): " MYSQL_PASS \n
+fi
+
+# Replace the PASSWORD placeholder.
+sed -i "s/PASSWORD/${MYSQL_PASS}/g" sites/default/settings.php
+
+# Replace the mysql user for good measure.
+sed -i "s/root/${MYSQL_USER}/g" sites/default/settings.php

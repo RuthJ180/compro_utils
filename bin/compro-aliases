@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+ALIASES=( $(drush sa) )
+ALIAS=''
+
+if [ ${#ALIASES[@]} == 1 ]; then
+  ALIAS=${ALIASES[0]}
+else
+  select opt in "${ALIASES[@]}"
+  do
+    case $opt in
+      *) 
+        ALIAS=$opt
+        break
+        ;;
+    esac
+  done
+fi
+
+echo "${ALIAS}"

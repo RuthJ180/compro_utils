@@ -5,15 +5,25 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Install a local copy of an existing site.
+
 NAME=''
-BRANCH=''
+ALIAS=''
+HOSTS=true
+SERVER=true
 
 # Allow flag to override config.
-while getopts "bg:x" OPTION
+while getopts "a:hs" OPTION
 do
   case $OPTION in
-    g)
-      BRANCH="$OPTARG"
+    a)
+      ALIAS="$OPTARG"
+      ;;
+    h)
+      HOSTS=false
+      ;;
+    s)
+      SERVER=false
       ;;
   esac
 done
@@ -21,27 +31,60 @@ done
 NAME=${@:$OPTIND:1}
 
 if [ -z "$NAME" ]; then
-  echo "Usage: compro-site -options projectname"
+  echo "Usage: compro-existing -options reponame"
   exit 1
 fi
 
-# Determine the correct branch.
-if [ "$INSTALL" == true ] && [ ${#BRANCH} == 0 ]; then
-  BRANCH=$(compro-branches $NAME)
+# Pull the repo down into a dir named $NAME (dl will prompt for branch).
+compro-dl ${NAME}
+
+# Get in there!
+cd ${NAME}
+
+# Logic to determine whether server and hosts should run.
+if [ "$HOSTS" == true ]; then
+  compro-hosts
 fi
 
-# Install a local copy of an existing site.
+if [ "$SERVER" == true ]; then
+  compro-server
+fi
 
-# Determine the desired branch to base it on.
-# Pull the repo down into a dir named $NAME
-# Logic to determine whether server and hosts should run.
 # Make a database to hold the sync.
-# Prep sites directories.
-# Make a settings.php file (with the flags and stuff).
-# Make aliases (This is the point where I'm beginning to consider making this a separate script)
-# Sync from a chosen alias (a parameter?)
-# Flush the caches
-# uli
+compro-db
 
+# Prep sites directories.
+compro-prep
+
+# Make a settings.php file (with the flags and stuff).
+compro-settings
+
+# Prompt for the preferred sync alias
+if [ ${#ALIAS} == 0 ]; then
+  ALIAS=$(compro-aliases)
+fi
+
+# Sync from a chosen alias
+WHICHDRUSH=$(which drush6)
+if [ ${#WHICHDRUSH} -gt 6 ]; then
+  drush6 sql-sync ${ALIAS} default
+  drush6 rsync ${ALIAS}:%files default:%files
+else
+  drush sql-sync ${ALIAS} default
+  drush rsync ${ALIAS}:%files default:%files
+fi4
+
+# Flush the caches
+drush cc all
+
+# Filesystem
+compro-fs
+
+# uli
+drush uli
+
+# @TODO add the local alias to the aliases file.
+
+cd ..
 echo "Done."
 exit 0
