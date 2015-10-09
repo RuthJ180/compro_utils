@@ -8,7 +8,6 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
-CORE=$(compro-coreversion)
 SITES='all'
 
 # Get custom configs.
@@ -26,7 +25,14 @@ do
   esac
 done
 
+# Sometimes the alias name isn't the current user. Set that.
+ALIAS_NAME="$USER"
+if [ ${USER_OVERRIDE+_} ]; then
+  ALIAS_NAME="$USER_OVERRIDE"
+fi
+
 # If d8, put aliases in sites/default/drush
+CORE=$(compro-coreversion)
 if [ ${CORE} == "8" ]; then
   SITES='default'
 fi
@@ -35,19 +41,42 @@ if ! [ ${LOCAL_EXT+_} ]; then
   read -p "Enter dotless TLD for URL, or leave blank for none: " LOCAL_EXT \n
 fi
 
-# Create drush alias file.
-mkdir sites/${SITES}/drush
-touch sites/${SITES}/drush/$NAME.aliases.drushrc.php
-echo "Creating drush alias file..."
-echo "<?php" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
-echo "" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
-echo "\$aliases['dev-"${USER}"'] = array(" >> sites/${SITES}/drush/$NAME.aliases.drushrc.php
-
-if [ -z ${LOCAL_EXT} ]; then
-  echo "  'uri' => '"${NAME}"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
-else
-  echo "  'uri' => '"${NAME}"."${LOCAL_EXT}"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+# Create drush alias file, if it doesn't exist yet.
+if [ ! -d sites/${SITES}/drush ]; then
+  mkdir sites/${SITES}/drush
 fi
 
-echo "  'root' => '"$(pwd)"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
-echo ");" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+if [ ! -f sites/${SITES}/drush/$NAME.aliases.drushrc.php ]; then
+  echo "Creating drush alias file..."
+  touch sites/${SITES}/drush/$NAME.aliases.drushrc.php
+  echo "<?php" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+fi
+
+# Determine whether the applicable alias already exists.
+ALIAS_EXISTS=false
+ALIASES=$(drush sa)
+THIS_ALIAS=${LOCAL_ENV}${ALIAS_NAME}
+FULL_ALIAS="@"${NAME}"."${THIS_ALIAS}
+if [[ "${ALIASES}" =~ "${FULL_ALIAS}" ]]; then
+  ALIAS_EXISTS=true
+fi
+
+# If a new alias is needed, insert it.
+if [ "$ALIAS_EXISTS" == false ]; then
+  echo "Inserting alias " ${THIS_ALIAS} "..."
+
+  echo "" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  echo "\$aliases['"${THIS_ALIAS}"'] = array(" >> sites/${SITES}/drush/$NAME.aliases.drushrc.php
+
+  if [ -z ${LOCAL_EXT} ]; then
+    echo "  'uri' => '"${NAME}"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  else
+    echo "  'uri' => '"${NAME}"."${LOCAL_EXT}"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  fi
+
+  echo "  'root' => '"$(pwd)"'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  echo "  'path-aliases' => array(" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  echo "    '%files' => 'sites/default/files'," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  echo "  )," >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+  echo ");" >> sites/${SITES}/drush/${NAME}.aliases.drushrc.php
+fi

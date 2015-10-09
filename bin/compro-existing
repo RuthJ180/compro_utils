@@ -36,7 +36,7 @@ if [ -z "$NAME" ]; then
 fi
 
 # Pull the repo down into a dir named $NAME (dl will prompt for branch).
-compro-dl ${NAME}
+compro-dl -r ${NAME}
 
 # Get in there!
 cd ${NAME}
@@ -60,6 +60,7 @@ compro-prep
 compro-settings
 
 # Prompt for the preferred sync alias
+echo "Please choose a drush alias to get the db/files from:"
 if [ ${#ALIAS} == 0 ]; then
   ALIAS=$(compro-aliases)
 fi
@@ -83,7 +84,7 @@ compro-fs
 # uli
 drush uli
 
-# @TODO add the local alias to the aliases file.
+compro-alias
 
 cd ..
 echo "Done."

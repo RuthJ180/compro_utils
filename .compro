@@ -14,6 +14,12 @@ FASTCGI_PASS="127.0.0.1:9000"
 # The TLD for the local dev environment, without the dot
 LOCAL_EXT="local"
 
+# A prefix to prepend to alias names and so forth.
+LOCAL_ENV='dev-'
+
+# Override the current USER where used (build instead of cashew)
+USER_OVERRIDE=false
+
 # Your MySQL root password.
 MYSQL_PASS='password'
 

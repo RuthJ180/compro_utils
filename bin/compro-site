@@ -85,7 +85,7 @@ if [ $BITBUCKET = 1 ]; then
 fi
 
 # Finish up.
-drush @${NAME}.dev-${USER} uli maintenance /
+drush uli
 cd ..
 echo "Done."
 exit 0

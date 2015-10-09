@@ -8,13 +8,17 @@ set -o nounset
 DESTINATION=''
 BRANCH=''
 CORE=$(compro-coreversion)
+REPO=false
 
 # Allow flag to override config.
-while getopts "bg:" OPTION
+while getopts "g:r" OPTION
 do
   case $OPTION in
     g)
       BRANCH="$OPTARG"
+      ;;
+    r)
+      REPO=true
       ;;
   esac
 done
@@ -110,4 +114,8 @@ fi
 
 # Download DL to the destination dir
 git clone -b ${BRANCH} git@bitbucket.org:alexfisher/${DL}.git ${DESTINATION}${DL}
-rm -rf ${DESTINATION}${DL}/.git
+
+# Conditionally remove the repo metadata.
+if [ "$REPO" == false ]; then
+  rm -rf ${DESTINATION}${DL}/.git
+fi

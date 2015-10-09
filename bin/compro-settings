@@ -16,17 +16,37 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "u:" OPTION
+while getopts "e:u:" OPTION
 do
   case $OPTION in
+    e)
+      ENV_TYPE=$OPTARG
+      ;;
     u)
       MYSQL_USER=$OPTARG
       ;;
   esac
 done
 
+# Choose the env type for the settings.
+if ! [ ${ENV_TYPE+_} ]; then
+  echo "Do you want a local dev or production-ready settings.php file?"
+  ENV_TYPES=( 'local' 'server' )
+  ENV_TYPE=''
+
+  select opt in "${ENV_TYPES[@]}"
+  do
+    case $opt in
+      *) 
+        ENV_TYPE=$opt
+        break
+        ;;
+    esac
+  done
+fi
+
 # Download local.settings.php from bitbucket to sites/default/settings.php
-curl -o sites/default/settings.php https://bitbucket.org/alexfisher/compro_config/raw/master/local.settings.php
+curl -o sites/default/settings.php https://bitbucket.org/alexfisher/compro_config/raw/master/${ENV_TYPE}.settings.php
 
 # Replace the DBNAME placeholder.
 sed -i "s/DBNAME/${NAME}/g" sites/default/settings.php 
