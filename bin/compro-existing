@@ -60,8 +60,8 @@ compro-prep
 compro-settings
 
 # Prompt for the preferred sync alias
-echo "Please choose a drush alias to get the db/files from:"
 if [ ${#ALIAS} == 0 ]; then
+  echo "Please choose a drush alias to get the db/files from:"
   ALIAS=$(compro-aliases)
 fi
 
@@ -73,7 +73,7 @@ if [ ${#WHICHDRUSH} -gt 6 ]; then
 else
   drush sql-sync ${ALIAS} default
   drush rsync ${ALIAS}:%files default:%files
-fi4
+fi
 
 # Flush the caches
 drush cc all

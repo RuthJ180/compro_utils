@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+ALIAS=''
+
+# Allow flag to override config.
+while getopts "a:" OPTION
+do
+  case $OPTION in
+    a)
+      ALIAS="$OPTARG"
+      ;;
+  esac
+done
+
+# Pull from git (on current branch).
+git pull origin
+
+# Prompt for the preferred sync alias
+if [ ${#ALIAS} == 0 ]; then
+  echo "Please choose a drush alias to get the db/files from:"
+  ALIAS=$(compro-aliases)
+fi
+
+# Sync from a chosen alias
+WHICHDRUSH=$(which drush6)
+if [ ${#WHICHDRUSH} -gt 6 ]; then
+  drush6 sql-sync -y ${ALIAS} default
+  drush6 -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
+else
+  drush sql-sync -y ${ALIAS} default
+  drush -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
+fi
+
+# Update Drupal db
+drush updatedb -y
+
+# Revert features
+drush fra -y
+
+# Flush the caches
+drush cc all
+
+# Display a login link in case that's desired by the user.
+drush uli
+
+exit 0

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Create or check out the 'build' branch
+git checkout prod || echo "Building branch from current rather than prod"
+git checkout -b build || git checkout build
+
+# Update Drupal (@TODO: Parse this output for smart commit messages)
+drush pm-update -y
+
+# Commit the changes
+git add .
+# Commit will fail if there are no changes.
+git commit -a -m "drush pm-update #drupalcare"
+
+# Merge into the stage and prod branches, as well as the current branch.
+git checkout stage && git merge build || echo "Could not merge to stage"
+# git checkout prod && git merge build || echo "Could not merge to prod"
+git checkout "${CURRENT_BRANCH}" && git merge build || echo "Could not merge to current branch (might have already been done)."
+git push origin --all
+
+# Check the current branch out.
+git checkout "${CURRENT_BRANCH}"
+
+exit 0
