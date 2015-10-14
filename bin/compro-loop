@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+for d in */ ; do
+  if ! [[ -L $d ]]; then
+    # Enter the directory
+    cd $d
+
+    # If it's a Drupal 6 site or higher with a git repo, do the specified command.
+    if [ $(compro-coreversion) -gt 5 ] && [ -d '.git' ]; then
+      eval "$@"
+    fi
+
+    # Leave the dir
+    cd ..
+  fi
+done
