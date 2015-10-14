@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+ADD=false
+HOSTNAME=''
+HOSTS=$(grep "^Host" ~/.ssh/config | cut -c6- | sort)
+IDENTITYFILE="~/.ssh/id_rsa"
+NAME=${PWD##*/}
+PORT=false
+SSHUSER=''
+
+# Allow flag to override config.
+while getopts "ah:i:n:p:u:" OPTION
+do
+  case $OPTION in
+    a)
+      ADD=true
+      ;;
+    h)
+      HOSTNAME="$OPTARG"
+      ;;
+    i)
+      IDENTITYFILE="$OPTARG"
+      ;;
+    n)
+      NAME="$OPTARG"
+      ;;
+    p)
+      PORT="$OPTARG"
+      ;;
+    u)
+      SSHUSER="$OPTARG"
+      ;;
+  esac
+done
+
+if [ ${ADD} == true ] && ! [[ "${HOSTS}" =~ "${NAME}" ]]; then
+  # Prompt for HostName if not provided
+  if [ ${#HOSTNAME} == 0 ]; then
+    read -p "Enter HostName (server address): " HOSTNAME \n
+  fi
+  
+  # Prompt for SSH User if not provided
+  if [ ${#SSHUSER} == 0 ]; then
+    read -p "Enter User: " SSHUSER \n
+  fi
+
+  # Print new config to bottom of file.
+  echo "" >> ~/.ssh/config
+  echo "Host "${NAME} >> ~/.ssh/config
+  echo "  HostName "${HOSTNAME} >> ~/.ssh/config
+  echo "  User "${SSHUSER} >> ~/.ssh/config
+  echo "  IdentityFile "${IDENTITYFILE} >> ~/.ssh/config
+  if [ ${PORT} ]; then
+    echo "  Port "${PORT} >> ~/.ssh/config
+  fi
+else
+  # Without the -a flag, just list the Hosts.
+  echo "${HOSTS}"
+fi
+
+exit 0
