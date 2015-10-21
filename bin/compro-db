@@ -36,8 +36,8 @@ fi
 # Create database.
 if [ "$INSTALL" = false ]; then
   echo "Dropping database ${NAME}"
-  mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "drop database ${NAME}" && echo "Done."
+  mysql --user=${MYSQL_USER} --password=${MYSQL_PASS} -e "drop database ${NAME}" && echo "Done."
 else
   echo "Creating database ${NAME}"
-  mysql -u${MYSQL_USER} -p${MYSQL_PASS} -e "create database ${NAME}" && echo "Done."
+  mysql --user=${MYSQL_USER} --password=${MYSQL_PASS} -e "create database ${NAME}" && echo "Done."
 fi
