@@ -8,6 +8,8 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
+DBNAME=${NAME//[!A-Za-z]/}
+
 MYSQL_USER=root
 INSTALL=true
 
@@ -36,10 +38,10 @@ fi
 # Create database.
 if [ "$INSTALL" = false ]; then
   echo "Dropping database ${NAME}"
-  mysql --user=${MYSQL_USER} --password="${MYSQL_PASS}" -e "drop database ${NAME}" && echo "Done."
+  mysql --user="${MYSQL_USER}" --password="${MYSQL_PASS}" -e "drop database ${DBNAME}" && echo "Done."
 
 else
   echo "Creating database ${NAME}"
-  mysql --user=${MYSQL_USER} --password="${MYSQL_PASS}" -e "create database ${NAME}" && echo "Done."
+  mysql --user="${MYSQL_USER}" --password="${MYSQL_PASS}" -e "create database ${DBNAME}" && echo "Done."
 
 fi

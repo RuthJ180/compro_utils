@@ -8,6 +8,7 @@ set -o nounset
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
+DBNAME=${NAME//[!A-Za-z]/}
 MYSQL_USER='root'
 
 # Get custom configs.
@@ -49,7 +50,7 @@ fi
 curl -o sites/default/settings.php https://bitbucket.org/alexfisher/compro_config/raw/master/${ENV_TYPE}.settings.php
 
 # Replace the DBNAME placeholder.
-sed -i "s/DBNAME/${NAME}/g" sites/default/settings.php 
+sed -i "s/DBNAME/${DBNAME}/g" sites/default/settings.php 
 
 # In case we don't have a MYSQL_PASS from the configs.
 if ! [ ${MYSQL_PASS+_} ]; then
