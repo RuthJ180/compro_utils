@@ -10,7 +10,7 @@ set -o nounset
 # Create files directory.
 if ! [ -d sites/default/files ]; then
   echo "Creating files directory..."
-  mkdir sites/default/files
+  mkdir -p sites/default/files
   chmod 777 sites/default/files
 fi
 
