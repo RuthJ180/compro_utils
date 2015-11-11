@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# Choose the env type for the files.
+if ! [ ${ENV_TYPE+_} ]; then
+  echo "What kind of environment are you setting up?"
+  ENV_TYPES=( 'local' 'testing' 'production' )
+  ENV_TYPE=''
+
+  select opt in "${ENV_TYPES[@]}"
+  do
+    case $opt in
+      *) 
+        ENV_TYPE=$opt
+        break
+        ;;
+    esac
+  done
+fi
+
+case ${ENV_TYPE} in
+  'local')
+    curl -o .htaccess https://bitbucket.org/alexfisher/compro_config/raw/master/local.htaccess
+    ;;
+  'testing')
+    curl -o .htaccess https://bitbucket.org/alexfisher/compro_config/raw/master/server.htaccess
+    curl -o robots.txt https://bitbucket.org/alexfisher/compro_config/raw/master/stage.robots.txt
+    ;;
+  'production')
+    curl -o .htaccess https://bitbucket.org/alexfisher/compro_config/raw/master/server.htaccess
+    curl -o robots.txt https://bitbucket.org/alexfisher/compro_config/raw/master/prod.robots.txt
+    ;;
+esac

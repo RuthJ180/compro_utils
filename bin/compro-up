@@ -9,7 +9,15 @@ CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Create or check out the 'build' branch
 git checkout prod || echo "Building branch from current rather than prod"
+
+# Git pull from prod to ensure this shit's up to date.
+git pull origin prod || echo "Production branch not available to pull"
+
+# Do the update stuff on a build branch.
 git checkout -b build || git checkout build
+
+# Pull from build if it's available?
+git pull origin build || echo "Build is up to date, apparently"
 
 # Update Drupal (@TODO: Parse this output for smart commit messages)
 drush pm-update -y
@@ -20,9 +28,9 @@ git add .
 git commit -a -m "drush pm-update #drupalcare"
 
 # Merge into the stage and prod branches, as well as the current branch.
-git checkout stage && git merge build || echo "Could not merge to stage"
-# git checkout prod && git merge build || echo "Could not merge to prod"
-git checkout "${CURRENT_BRANCH}" && git merge build || echo "Could not merge to current branch (might have already been done)."
+git checkout stage && git pull origin stage && git merge build || echo "Could not merge to stage"
+git checkout prod && git pull origin && git merge build || echo "Could not merge to prod"
+git checkout "${CURRENT_BRANCH}" && git pull origin && git merge build || echo "Could not merge to current branch (might have already been done)."
 git push origin --all
 
 # Check the current branch out.
