@@ -55,6 +55,7 @@ if [ ${ADD} == true ] && ! [[ "${HOSTS}" =~ "${NAME}" ]]; then
   echo "  HostName "${HOSTNAME} >> ~/.ssh/config
   echo "  User "${SSHUSER} >> ~/.ssh/config
   echo "  IdentityFile "${IDENTITYFILE} >> ~/.ssh/config
+  # @TODO: Check that the port is conveyed properly.
   if [ ${PORT} ]; then
     echo "  Port "${PORT} >> ~/.ssh/config
   fi

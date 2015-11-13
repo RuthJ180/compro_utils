@@ -17,9 +17,6 @@ do
   esac
 done
 
-# Pull from git (on current branch).
-git pull origin
-
 # Prompt for the preferred sync alias
 if [ ${#ALIAS} == 0 ]; then
   echo "Please choose a drush alias to get the db/files from:"

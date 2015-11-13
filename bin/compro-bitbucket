@@ -9,6 +9,9 @@ set -o nounset
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
 
+# @TODO allow a -r flag for overriding origin to a desired remote name.
+# @TODO add a -h for the slick auto-doc feature we don't know we want.
+
 # Get custom configs.
 if [ -e ~/.compro ]; then
   source ~/.compro

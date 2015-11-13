@@ -11,7 +11,7 @@ NAME=${PWD##*/}
 
 # Initial git commit.
 git init
-git config core.fileMode false
+git config core.filemode false
 git add .
 git commit -m "Initial commit"
 git branch -m master stage
