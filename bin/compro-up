@@ -23,12 +23,16 @@ git checkout -b build || git checkout build
 git pull origin build || echo "Build is up to date, apparently"
 
 # Update Drupal (@TODO: Parse this output for smart commit messages)
-drush pm-update -y
+# NOTE: This will only work right if you use .txt ignoring from .gitignore_global!
+drush pm-update -y > commit-msg.txt
 
 # Commit the changes
 git add .
 # Commit will fail if there are no changes.
-git commit -a -m 
+cat commit-msg.txt | grep "^ .*[0-9]\..*$" | (echo "${COMMIT_MESSAGE}" && cat) | git commit --file -
+
+rm commit-msg.txt
+
 git push origin build "${COMMIT_MESSAGE}"
 
 git checkout "${CURRENT_BRANCH}"
