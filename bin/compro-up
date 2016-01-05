@@ -17,23 +17,21 @@ git checkout prod || echo "Building branch from current rather than prod"
 git pull origin prod || echo "Production branch not available to pull"
 
 # Do the update stuff on a build branch.
-git checkout -b build || git checkout build
+git checkout -b build || git checkout build && git merge prod
 
 # Pull from build if it's available? @TODO: Will this fast-forward correctly?
 git pull origin build || echo "Build is up to date, apparently"
 
 # Update Drupal (@TODO: Parse this output for smart commit messages)
 # NOTE: This will only work right if you use .txt ignoring from .gitignore_global!
-drush pm-update -y > commit-msg.txt
+drush pm-update -y
 
 # Commit the changes
 git add .
 # Commit will fail if there are no changes.
-cat commit-msg.txt | grep "^ .*[0-9]\..*$" | (echo "${COMMIT_MESSAGE}" && cat) | git commit --file -
+git commit -m "${COMMIT_MESSAGE}"
 
-rm commit-msg.txt
-
-git push origin build "${COMMIT_MESSAGE}"
+git push origin build
 
 git checkout "${CURRENT_BRANCH}"
 
