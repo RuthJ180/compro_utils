@@ -24,14 +24,8 @@ if [ ${#ALIAS} == 0 ]; then
 fi
 
 # Sync from a chosen alias
-WHICHDRUSH=$(which drush6)
-if [ ${#WHICHDRUSH} -gt 6 ]; then
-  drush6 sql-sync -y ${ALIAS} default
-  drush6 -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
-else
-  drush sql-sync -y ${ALIAS} default
-  drush -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
-fi
+drush sql-sync -y ${ALIAS} default
+drush -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
 
 # Update Drupal db
 drush updatedb -y
