@@ -5,6 +5,12 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Get custom configs.
+if [ -e ~/.compro ]; then
+  source ~/.compro
+fi
+
+NAME=${PWD##*/}
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="drush pm-update #drupalcare"
 
@@ -34,5 +40,11 @@ git commit -m "${COMMIT_MESSAGE}"
 git push origin build
 
 git checkout "${CURRENT_BRANCH}"
+
+# Send a slack message if slack variable is set
+if [ -n "$SLACK" ]; then
+  TEXT="Sirs and madams, $NAME has been succesfully updated."
+  curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
+fi
 
 exit 0

@@ -38,3 +38,6 @@ WEB_SERVER='apache'
 # Remote host (for alias)
 REMOTE_HOST=''
 REMOTE_USER=''
+
+# Slack webhook. This is only needed for build.
+SLACK=''
