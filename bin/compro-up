@@ -13,8 +13,18 @@ fi
 NAME=${PWD##*/}
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="drush pm-update #drupalcare"
+SECURITY_ONLY=false
 
+# Allow flag to override config.
 # @TODO: Flag to allow any remote desired.
+while getopts "s" OPTION
+do
+  case $OPTION in
+    s)
+      SECURITY_ONLY=true
+      ;;
+  esac
+done
 
 # Create or check out the 'build' branch
 git checkout prod || echo "Building branch from current rather than prod"
@@ -29,8 +39,11 @@ git checkout -b build || git checkout build && git merge prod
 git pull origin build || echo "Build is up to date, apparently"
 
 # Update Drupal (@TODO: Parse this output for smart commit messages)
-# NOTE: This will only work right if you use .txt ignoring from .gitignore_global!
-drush pm-update -y
+if [ "$SECURITY_ONLY" == true ]; then
+  drush pm-update --security-only
+else
+  drush pm-update -y
+fi
 
 # Commit the changes
 git add .
@@ -41,7 +54,7 @@ git push origin build
 
 git checkout "${CURRENT_BRANCH}"
 
-# Send a slack message if slack variable is set
+# Send a slack message if slack variable is set.
 if [ -n "$SLACK" ]; then
   TEXT="Sirs and madams, $NAME has been succesfully updated."
   curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
