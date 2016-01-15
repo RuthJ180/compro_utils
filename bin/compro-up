@@ -40,7 +40,7 @@ git pull origin build || echo "Build is up to date, apparently"
 
 # Update Drupal (@TODO: Parse this output for smart commit messages)
 if [ "$SECURITY_ONLY" == true ]; then
-  drush pm-update --security-only
+  drush -y pm-update --security-only
 else
   drush pm-update -y
 fi
