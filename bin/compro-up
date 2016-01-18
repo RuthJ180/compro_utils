@@ -59,14 +59,13 @@ git commit -m "${COMMIT_MESSAGE}" || UPDATES=false
 
 if [ "$UPDATES" == true ]; then
   git push origin build
-  # Send a slack message if slack variable is set.
   if [ -n "$SLACK" ]; then
-    TEXT="Sirs and madams, $NAME has been succesfully updated."
+    TEXT=":warning: Sirs and madams, $NAME has been succesfully updated, please review."
     curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
   fi
 else
   if [ -n "$SLACK" ]; then
-    TEXT="Sirs and madams, $NAME required no updates, you may rest easy."
+    TEXT=":white_check_mark: Sirs and madams, $NAME required no updates, you may rest easy."
     curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
   fi
 fi
