@@ -14,6 +14,7 @@ NAME=${PWD##*/}
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="drush pm-update #drupalcare"
 SECURITY_ONLY=false
+UPDATES=true
 
 # Allow flag to override config.
 # @TODO: Flag to allow any remote desired.
@@ -54,16 +55,22 @@ fi
 # Commit the changes
 git add .
 # Commit will fail if there are no changes.
-git commit -m "${COMMIT_MESSAGE}"
+git commit -m "${COMMIT_MESSAGE}" || UPDATES=false
 
-git push origin build
+if [ "$UPDATES" == true ]; then
+  # git push origin build
+  # Send a slack message if slack variable is set.
+  if [ -n "$SLACK" ]; then
+    TEXT="Sirs and madams, $NAME has been succesfully updated."
+    curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
+  fi
+else
+  if [ -n "$SLACK" ]; then
+    TEXT="Sirs and madams, $NAME required no updates, you may rest easy."
+    curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
+  fi
+fi
 
 git checkout "${CURRENT_BRANCH}"
-
-# Send a slack message if slack variable is set.
-if [ -n "$SLACK" ]; then
-  TEXT="Sirs and madams, $NAME has been succesfully updated."
-  curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
-fi
 
 exit 0
