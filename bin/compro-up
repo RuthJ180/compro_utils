@@ -58,7 +58,7 @@ git add .
 git commit -m "${COMMIT_MESSAGE}" || UPDATES=false
 
 if [ "$UPDATES" == true ]; then
-  # git push origin build
+  git push origin build
   # Send a slack message if slack variable is set.
   if [ -n "$SLACK" ]; then
     TEXT="Sirs and madams, $NAME has been succesfully updated."
