@@ -38,6 +38,12 @@ git checkout -b build || git checkout build && git merge prod
 # Pull from build if it's available? @TODO: Will this fast-forward correctly?
 git pull origin build || echo "Build is up to date, apparently"
 
+# Send a slack message if slack variable is set.
+if [ -n "$SLACK" ]; then
+  TEXT="Sirs and madams, I am checking to see if $NAME needs updated."
+  curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
+fi
+
 # Update Drupal (@TODO: Parse this output for smart commit messages)
 if [ "$SECURITY_ONLY" == true ]; then
   drush -y pm-update --security-only
