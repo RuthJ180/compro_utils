@@ -12,28 +12,35 @@ $description = '[Site: ' . $pwd . '] ';
 
 // Get the available updates from drush.
 exec('drush ups --format=php', $ups);
-$ups = unserialize($ups[0]);
+if (isset($ups[0])) {
+  $ups = unserialize($ups[0]);
+}
+else {
+  $title .= 'No code updates available.';
+}
 
 $releases = array();
 $core = FALSE;
 $modules = 0;
 $security = 0;
-foreach ($ups as $key => $meta) {
-  // Count security updates.
-  if ($meta['status'] != 4) {
-    $security++;
-    $releases[] = '(SECURITY) ' . $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
-  }
-  else {
-    $releases[] = $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
-  }
+if (!empty($ups)) {
+  foreach ($ups as $key => $meta) {
+    // Count security updates.
+    if ($meta['status'] != 4) {
+      $security++;
+      $releases[] = '(SECURITY) ' . $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
+    }
+    else {
+      $releases[] = $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
+    }
 
-  // Toggle if there's a core update, otherwise count updates.
-  if ($meta['type'] === 'project_core') {
-    $core = TRUE;
-  }
-  else {
-    $modules++;
+    // Toggle if there's a core update, otherwise count updates.
+    if ($meta['type'] === 'project_core') {
+      $core = TRUE;
+    }
+    else {
+      $modules++;
+    }
   }
 }
 
