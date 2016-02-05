@@ -1,0 +1,142 @@
+#!/usr/bin/php
+<?php
+/**
+ * @file
+ * CLI command to call home to the Drupalcare server with update information.
+ */
+
+$title = 'Drupalcare updates: ';
+exec('echo ${PWD##*/}', $pwd);
+$pwd = $pwd[0];
+$description = '[Site: ' . $pwd . '] ';
+
+// Get the available updates from drush.
+exec('drush ups --format=php', $ups);
+$ups = unserialize($ups[0]);
+
+$releases = array();
+$core = FALSE;
+$modules = 0;
+$security = 0;
+foreach ($ups as $key => $meta) {
+  // Count security updates.
+  if ($meta['status'] != 4) {
+    $security++;
+    $releases[] = '(SECURITY) ' . $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
+  }
+  else {
+    $releases[] = $meta['title'] . ' from ' . $meta['existing_version'] . ' to ' . $meta['latest_version'];
+  }
+
+  // Toggle if there's a core update, otherwise count updates.
+  if ($meta['type'] === 'project_core') {
+    $core = TRUE;
+  }
+  else {
+    $modules++;
+  }
+}
+
+// Format out the title.
+if ($security >= 2) {
+  $title .= '(includes ' . $security . ' SECURITY updates): ';
+}
+elseif ($security == 1) {
+  $title .= '(include a SECURITY update): ';
+}
+
+if ($core) {
+  $title .= 'Drupal core ';
+}
+
+if ($modules >= 2) {
+  $title .= 'and ' . $modules . ' modules/themes';
+}
+elseif ($modules == 1) {
+  $title .= 'and a module/theme';
+}
+
+echo $title . "\n";
+
+// Format out the description.
+$description .= implode(', ', $releases);
+echo $description ."\n";
+
+// Get the mapping of sites to nids, for constructing the entityref.
+$nid = FALSE;
+$uuid = FALSE;
+$nids_map = file_get_contents('http://drupalcare.build.commercialprogression.net/sites/nids');
+$nids_map = json_decode($nids_map);
+foreach ($nids_map as $entry) {
+  if ($entry->field_site_id === $pwd) {
+    $nid = $entry->nid;
+    $uuid = $entry->uuid;
+    break;
+  }
+}
+
+// Construct the HAL-JSON object.
+$entity = [
+  'title' => [[
+    'value' => $title
+  ]],
+  'field_update_description' => [[
+    'value' => $description
+  ]],
+  'type' => [[
+    'target_id' => 'component_update'
+  ]],
+  '_links' => [
+    'type' => [
+      'href' => 'http://drupalcare.build.commercialprogression.net/rest/type/component/component_update'
+    ]
+  ],
+];
+
+// Add the site relation if we know it.
+if ($nid) {
+  $entity['_links']['http://drupalcare.build.commercialprogression.net/rest/relation/component/component_update/field_update_site'] = [[
+    'href' => 'http://drupalcare.build.commercialprogression.net/node/' . $nid . '?_format=hal_json'
+  ]];
+  $entity['_embedded'] = [[
+    '_links' => [
+      'self' => [
+        'href' => 'http://drupalcare.build.commercialprogression.net/node/' . $nid . '?_format=hal_json'
+      ],
+      'type' => [
+        'href' => 'http://drupalcare.build.commercialprogression.net/rest/type/node/site'
+      ]
+    ],
+    'uuid' => [[
+      'value' => $uuid
+    ]]
+  ]];
+  // This is the addition to the JSON that *actually* populates the entity.
+  $entity['field_update_site'] = [[
+    'target_id' => $nid
+  ]];
+}
+
+$serialized_entity = json_encode($entity);
+echo $serialized_entity;
+
+// Post the object to the DrupalCare site.
+// u: cashew p: password we will want to change
+// csrf: h_LqR_TBeQFx26h3PXUoNB0R9YFSxyyFLFqn_gNZL1I
+$process = curl_init('http://drupalcare.build.commercialprogression.net/entity/component?_format=hal_json');
+curl_setopt($process, CURLOPT_HTTPHEADER, array(
+  'Content-Type: application/hal+json',
+  'Accept: application/json',
+  'X-CSRF-Token: h_LqR_TBeQFx26h3PXUoNB0R9YFSxyyFLFqn_gNZL1I'
+));
+curl_setopt($process, CURLOPT_HEADER, 1);
+curl_setopt($process, CURLOPT_USERPWD, "cashew:password we will want to change");
+curl_setopt($process, CURLOPT_TIMEOUT, 30);
+curl_setopt($process, CURLOPT_POST, 1);
+curl_setopt($process, CURLOPT_POSTFIELDS, $serialized_entity);
+curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
+$return = curl_exec($process);
+curl_close($process);
+
+print_r($return);
+?>
