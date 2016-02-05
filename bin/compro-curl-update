@@ -56,11 +56,8 @@ elseif ($modules == 1) {
   $title .= 'and a module/theme';
 }
 
-echo $title . "\n";
-
 // Format out the description.
 $description .= implode(', ', $releases);
-echo $description ."\n";
 
 // Get the mapping of sites to nids, for constructing the entityref.
 $nid = FALSE;
@@ -116,9 +113,7 @@ if ($nid) {
     'target_id' => $nid
   ]];
 }
-
 $serialized_entity = json_encode($entity);
-echo $serialized_entity;
 
 // Post the object to the DrupalCare site.
 // u: cashew p: password we will want to change
@@ -138,5 +133,4 @@ curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
 $return = curl_exec($process);
 curl_close($process);
 
-print_r($return);
 ?>
