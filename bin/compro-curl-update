@@ -16,7 +16,7 @@ if (isset($ups[0])) {
   $ups = unserialize($ups[0]);
 }
 else {
-  $title .= 'No code updates available.';
+  $title .= 'Checked for Drupal updates';
 }
 
 $releases = array();
@@ -64,7 +64,9 @@ elseif ($modules == 1) {
 }
 
 // Format out the description.
-$description .= implode(', ', $releases);
+if (count($releases)) {
+  $description .= implode(', ', $releases);
+}
 
 // Get the mapping of sites to nids, for constructing the entityref.
 $nid = FALSE;
@@ -96,6 +98,13 @@ $entity = [
     ]
   ],
 ];
+
+// If updates applied, click the checkbox.
+if (count($releases)) {
+  $entity['field_update_ran'] = [[
+    'value' => '1'
+  ]];
+}
 
 // Add the site relation if we know it.
 if ($nid) {
@@ -139,5 +148,3 @@ curl_setopt($process, CURLOPT_POSTFIELDS, $serialized_entity);
 curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
 $return = curl_exec($process);
 curl_close($process);
-
-?>
