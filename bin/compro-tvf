@@ -6,7 +6,7 @@ set -o nounset
 # set -o xtrace
 
 # Check to ensure we're in the site root.
-if [ ! -d 'sites/all/modules' ]; then
+if [ ! -d 'sites/all/modules' && ! -o "h" ]; then
   echo "Must be executed from the root of a Drupal site."
   exit 1
 fi

@@ -1,23 +1,32 @@
 #!/usr/bin/env bash
 
+WHICHCOMPRO=$(which compro)
+
+# Check for the help flag.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      less ${WHICHCOMPRO:0:(-11)}/readme.md
+      exit 0
+      ;;
+  esac
+done
+
 if [ -z $1 ]; then
-  echo "Usage: compro [command] arguments"
-  echo "Commands:"
-  echo "  alias      - Add a drush alias to a site"
-  echo "  bitbucket  - Create/push a bitbucket repo"
-  echo "  coreversion- Get the core version or 0"
-  echo "  ctf        - Generate a feature for content"
-  echo "  db         - Create a mysql db for a site"
-  echo "  dl         - Download from our bitbucket"
-  echo "  ebf        - Generate a feature for entities"
-  echo "  fs         - Set sensible file permissions"
-  echo "  git        - init and commit to a git repo"
-  echo "  hosts      - Add the site to the hosts file"
-  echo "  install    - install a site with drush"
-  echo "  make       - download compro_install_profile"
-  echo "  prep       - create sites/default stuff"
-  echo "  server     - Add virtualhost to web server"
-  echo "  tvf        - Generate a feature for vocabs"
+
+cat<<EOF
+
+  ██████╗ ██████╗ ███╗   ███╗██████╗ ██████╗  ██████╗
+ ██╔════╝██╔═══██╗████╗ ████║██╔══██╗██╔══██╗██╔═══██╗
+ ██║     ██║   ██║██╔████╔██║██████╔╝██████╔╝██║   ██║
+ ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██╔══██╗██║   ██║
+ ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║  ██║╚██████╔╝
+  ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝ ╚═════╝
+
+EOF
+
+  ls -1 ${WHICHCOMPRO:0:(-6)} | grep "compro-"
   exit 0
 fi
 

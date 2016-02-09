@@ -5,17 +5,46 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-dl"
+DESC="Download a project from bitbucket and place it somewhere intelligently."
+USAGE="compro-dl [Optional REPONAME]"
+declare -A FLAGS
+FLAGS=(
+  [g]="Set the desired branch of the repo"
+  [h]="Get help info"
+  [r]="Set to keep the .git/ repo in place"
+)
+
 DESTINATION=''
 BRANCH=''
 CORE=$(compro-coreversion)
 REPO=false
 
 # Allow flag to override config.
-while getopts "g:r" OPTION
+while getopts "g:hr" OPTION
 do
   case $OPTION in
     g)
       BRANCH="$OPTARG"
+      ;;
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
     r)
       REPO=true

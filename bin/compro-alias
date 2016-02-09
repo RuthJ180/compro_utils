@@ -5,6 +5,16 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-alias"
+DESC="Add a drush alias to a site"
+USAGE="compro-alias -t dev"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [t]="Lets you set the (dotless) TLD"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -16,9 +26,27 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "t:" OPTION
+while getopts "ht:" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     t)
       LOCAL_EXT="$OPTARG"
       ;;

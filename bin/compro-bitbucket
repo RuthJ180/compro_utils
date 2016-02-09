@@ -5,12 +5,44 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-bitbucket"
+DESC="Create/push a bitbucket repo. Prompts if defaults aren't set in ~/.compro."
+USAGE="compro-bitbucket"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
 
 # @TODO allow a -r flag for overriding origin to a desired remote name.
-# @TODO add a -h for the slick auto-doc feature we don't know we want.
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
 
 # Get custom configs.
 if [ -e ~/.compro ]; then

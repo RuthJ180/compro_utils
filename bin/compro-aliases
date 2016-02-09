@@ -5,6 +5,40 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-aliases"
+DESC="Get a selectable list of drush aliases for a site."
+USAGE="compro-aliases"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
 ALIASES=( $(drush sa) )
 ALIAS=''
 

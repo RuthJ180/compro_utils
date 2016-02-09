@@ -5,6 +5,17 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-db"
+DESC="Create a mysql db for a site. Prompts if defaults aren't set in ~/.compro"
+USAGE="compro-db"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [u]="Override or set the MySQL user (usually root) for this command"
+  [x]="Uninstall the database"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -19,9 +30,27 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "u:x" OPTION
+while getopts "hu:x" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     u)
       MYSQL_USER=$OPTARG
       ;;

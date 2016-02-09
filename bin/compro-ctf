@@ -5,8 +5,19 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-ctf"
+DESC="Create a feature containing a content type and view named after it."
+USAGE="compro-ctf"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [p]="Set the feature name prefix. Will be site name by default"
+  [t]="[prompted otherwise] Set the machine name of the content type"
+)
+
 # Check to ensure we're in the site root.
-if [ ! -d 'sites/all/modules' ]; then
+if [ ! -d 'sites/all/modules' && ! -o "h" ]; then
   echo "Must be executed from the root of a Drupal site."
   exit 1
 fi
@@ -16,9 +27,27 @@ fi
 NAME=${PWD##*/}
 
 # Allow flag to override config.
-while getopts "p:t:" OPTION
+while getopts "hp:t:" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
   	p)
       PREFIX=$OPTARG
       ;;
