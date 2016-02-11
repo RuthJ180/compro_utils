@@ -5,6 +5,16 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-up"
+DESC="Do core and module updates using the 'build' workflow."
+USAGE="compro-up"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [s]="Only do security updates"
+)
+
 # Get custom configs.
 if [ -e ~/.compro ]; then
   source ~/.compro
@@ -18,9 +28,27 @@ UPDATES=true
 
 # Allow flag to override config.
 # @TODO: Flag to allow any remote desired.
-while getopts "s" OPTION
+while getopts "hs" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     s)
       SECURITY_ONLY=true
       ;;

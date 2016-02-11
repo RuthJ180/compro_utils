@@ -5,6 +5,20 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-server"
+DESC="Set up a web server for the [Drupal] site in the current directory."
+USAGE="compro-server"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [i]="Set the desired listening IP"
+  [p]="Set the IP:port for PHP fastcgi"
+  [s]="Choose a web server (either apache or nginx)"
+  [t]="Set the desired TLD"
+  [x]="Remove the web server instead of creating one"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -17,9 +31,27 @@ fi
 
 # Allow flag to override config.
 # @TODO add a flag for using drush runserver instead of nginx/apache.
-while getopts "i:p:s:t:x" OPTION
+while getopts "hi:p:s:t:x" OPTION
 do
   case ${OPTION} in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     i)
       NGINX_IP=${OPTARG}
       ;;

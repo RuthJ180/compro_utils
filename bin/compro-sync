@@ -5,14 +5,42 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-sync"
+DESC="Grab a site's db/files from one of the remote drush aliases."
+USAGE="compro-sync"
+declare -A FLAGS
+FLAGS=(
+  [a]="Specify the alias ahead of time (otherwise interactive)"
+  [h]="Get help info"
+)
+
 ALIAS=''
 
 # Allow flag to override config.
-while getopts "a:" OPTION
+while getopts "a:h" OPTION
 do
   case $OPTION in
     a)
       ALIAS="$OPTARG"
+      ;;
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
   esac
 done

@@ -10,6 +10,28 @@ ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 ini_set('xdebug.max_nesting_level', 200);
 
+$cmd_name = 'compro-curl-update';
+$desc = 'Send a summary of core/module updates to the drupalcare server.';
+$usage = 'compro-curl-update';
+$flags = array(
+  'h' => 'Get help info',
+);
+
+// Handle flags.
+$options = getopt('h');
+if ($options && isset($options['h'])) {
+  echo '### ' . $cmd_name . "\n\n";
+  echo $desc . "\n\n";
+  echo '#### Usage' . "\n\n";
+  echo '  > ' . $usage . "\n\n";
+  echo '#### Flags' . "\n\n";
+  foreach ($flags as $flag => $does) {
+    echo '**' . $flag . '** ' . $does . "\n";
+  }
+  echo "\n";
+  exit;
+}
+
 $title = 'Drupalcare updates: ';
 exec('echo ${PWD##*/}', $pwd);
 $pwd = $pwd[0];

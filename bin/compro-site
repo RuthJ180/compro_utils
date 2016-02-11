@@ -5,13 +5,25 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-site"
+DESC="Go from zero to a working drupal site, or a drupal site to zero."
+USAGE="compro-site sitename"
+declare -A FLAGS
+FLAGS=(
+  [b]="Upload new project to bitbucket"
+  [g]="Specify a git branch for the site ahead of time"
+  [h]="Get help info"
+  [x]="Uninstall a site instead"
+)
+
 NAME=''
 BITBUCKET=0
 INSTALL=true
 BRANCH=''
 
 # Allow flag to override config.
-while getopts "bg:x" OPTION
+while getopts "bg:hx" OPTION
 do
   case $OPTION in
     b)
@@ -19,6 +31,24 @@ do
       ;;
     g)
       BRANCH="$OPTARG"
+      ;;
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
     x)
       INSTALL=false

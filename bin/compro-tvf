@@ -5,8 +5,19 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-tvf"
+DESC="Create a feature with a taxonomy vocabulary and a corresponding view."
+USAGE="compro-tvf"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [p]="Set the prefix for the feature name (defaults to site name)"
+  [t]="[prompted] Set the machine name of the taxonomy vocabulary"
+)
+
 # Check to ensure we're in the site root.
-if [ ! -d 'sites/all/modules' && ! -o "h" ]; then
+if [ ! -d 'sites/all/modules' ] && [ -o 'h' ]; then
   echo "Must be executed from the root of a Drupal site."
   exit 1
 fi
@@ -16,9 +27,27 @@ fi
 NAME=${PWD##*/}
 
 # Allow flag to override config.
-while getopts "p:t:" OPTION
+while getopts "hp:t:" OPTION
 do
   case $OPTION in
+  	h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
   	p)
       PREFIX=$OPTARG
       ;;

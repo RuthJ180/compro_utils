@@ -5,6 +5,21 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-ssh"
+DESC="List ssh hosts, or add a new one."
+USAGE="compro-ssh"
+declare -A FLAGS
+FLAGS=(
+  [a]="Add a host entry"
+  [h]="Get help info"
+  [i]="Set the path to the private key to use (defaults to ~/.ssh/id_rsa)"
+  [n]="Change the name (defaults to the present working directory)"
+  [o]="Specify the hostname ahead of time"
+  [p]="Specify a port"
+  [u]="Specify the user ahead of time"
+)
+
 ADD=false
 HOSTNAME=''
 HOSTS=$(grep "^Host" ~/.ssh/config | cut -c6- | sort)
@@ -14,20 +29,38 @@ PORT=false
 SSHUSER=''
 
 # Allow flag to override config.
-while getopts "ah:i:n:p:u:" OPTION
+while getopts "ahi:n:o:p:u:" OPTION
 do
   case $OPTION in
     a)
       ADD=true
       ;;
     h)
-      HOSTNAME="$OPTARG"
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
     i)
       IDENTITYFILE="$OPTARG"
       ;;
     n)
       NAME="$OPTARG"
+      ;;
+    o)
+      HOSTNAME="$OPTARG"
       ;;
     p)
       PORT="$OPTARG"

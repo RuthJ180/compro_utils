@@ -23,7 +23,7 @@ fi
 BRANCH=''
 
 # Allow flag to override config.
-while getopts "g:" OPTION
+while getopts "g:h" OPTION
 do
   case $OPTION in
     g)

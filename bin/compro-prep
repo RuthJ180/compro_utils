@@ -5,6 +5,40 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-prep"
+DESC="Make sure things like sites/default/files and settings.php exist."
+USAGE="compro-prep"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
 # This command is run from inside the site directory.
 
 # Create files directory.

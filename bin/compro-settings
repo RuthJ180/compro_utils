@@ -5,6 +5,17 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-settings"
+DESC="Download and fill out a settings.php that is appropriate for the environment."
+USAGE="compro-settings"
+declare -A FLAGS
+FLAGS=(
+  [e]="Provide the desired environment ('local' or 'server') instead of choosing interactively"
+  [h]="Get help info"
+  [u]="Provide the MySQL username, if other than root"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -18,11 +29,29 @@ fi
 
 # Allow flag to override config.
 # @TODO: Allow a flag to override dbname, just in case.
-while getopts "e:u:" OPTION
+while getopts "e:hu:" OPTION
 do
   case $OPTION in
     e)
       ENV_TYPE=$OPTARG
+      ;;
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
     u)
       MYSQL_USER=$OPTARG

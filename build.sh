@@ -9,3 +9,7 @@ set -o nounset
 cp _docs/intro.md readme.md
 
 # Loop through the commands and call their -h versions.
+for cmd in $(ls -1 bin/ | grep compro-)
+do
+  $cmd -h >> readme.md
+done
