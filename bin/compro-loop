@@ -5,6 +5,40 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-loop"
+DESC="Loop through a directory of [Drupal site] directories and run commands."
+USAGE="compro-loop drush status"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
 for d in */ ; do
   if ! [[ -L $d ]]; then
     # Enter the directory

@@ -5,6 +5,11 @@
  * CLI command to call home to the Drupalcare server with update information.
  */
 
+error_reporting(E_ALL);
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
+ini_set('xdebug.max_nesting_level', 200);
+
 $title = 'Drupalcare updates: ';
 exec('echo ${PWD##*/}', $pwd);
 $pwd = $pwd[0];
@@ -24,6 +29,7 @@ $core = FALSE;
 $modules = 0;
 $security = 0;
 if (!empty($ups)) {
+  echo 'Updates found. Formatting an update message.';
   foreach ($ups as $key => $meta) {
     // Count security updates.
     if ($meta['status'] != 4) {
@@ -133,12 +139,13 @@ $serialized_entity = json_encode($entity);
 
 // Post the object to the DrupalCare site.
 // u: cashew p: password we will want to change
-// csrf: h_LqR_TBeQFx26h3PXUoNB0R9YFSxyyFLFqn_gNZL1I
+// csrf: Ch-e9miR8JMu3t9_4lxTeffxHtrltyrTA-K4Kc62dIY
+echo 'Sending update to drupalcare.build.commercialprogression.net';
 $process = curl_init('http://drupalcare.build.commercialprogression.net/entity/component?_format=hal_json');
 curl_setopt($process, CURLOPT_HTTPHEADER, array(
   'Content-Type: application/hal+json',
   'Accept: application/json',
-  'X-CSRF-Token: h_LqR_TBeQFx26h3PXUoNB0R9YFSxyyFLFqn_gNZL1I'
+  'X-CSRF-Token: Ch-e9miR8JMu3t9_4lxTeffxHtrltyrTA-K4Kc62dIY'
 ));
 curl_setopt($process, CURLOPT_HEADER, 1);
 curl_setopt($process, CURLOPT_USERPWD, "cashew:password we will want to change");

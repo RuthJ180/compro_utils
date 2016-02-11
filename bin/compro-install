@@ -5,6 +5,16 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-install"
+DESC="Install a drupal site using drush."
+USAGE="compro-install"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [u]="Override the default MYSQL user (root) for the install process"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -17,9 +27,27 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "u:" OPTION
+while getopts "hu:" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     u)
       MYSQL_USER=$OPTARG
       ;;

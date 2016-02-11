@@ -5,6 +5,18 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-hosts"
+DESC="Create or remove an entry in /etc/hosts for the site in question."
+USAGE="compro-hosts"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [i]="Set the host IP"
+  [t]="Override the default TLD for the host"
+  [x]="Remove the entry instead of adding it"
+)
+
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
@@ -16,9 +28,27 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "i:t:x" OPTION
+while getopts "hi:t:x" OPTION
 do
   case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
     i)
       NGINX_IP=$OPTARG
       ;;

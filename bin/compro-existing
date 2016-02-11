@@ -5,7 +5,17 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
-# Install a local copy of an existing site.
+# Help info.
+THIS="compro-existing"
+DESC="Install a local copy of an existing site."
+USAGE="compro-existing reponame"
+declare -A FLAGS
+FLAGS=(
+  [a]="The alias to pull database/files from"
+  [h]="Get help info"
+  [o]="Turn off the creation of an /etc/hosts entry"
+  [s]="Turn off the creation of a web server virtualhost"
+)
 
 NAME=''
 ALIAS=''
@@ -13,13 +23,31 @@ HOSTS=true
 SERVER=true
 
 # Allow flag to override config.
-while getopts "a:hs" OPTION
+while getopts "a:hos" OPTION
 do
   case $OPTION in
     a)
       ALIAS="$OPTARG"
       ;;
     h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+    o)
       HOSTS=false
       ;;
     s)

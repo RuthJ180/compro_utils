@@ -5,6 +5,16 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-make"
+DESC="Build out a Drupal site from the compro_install_profile."
+USAGE="compro-make newprojectname"
+declare -A FLAGS
+FLAGS=(
+  [g]="Choose the branch to use"
+  [h]="Get help info"
+)
+
 if [ -z $1 ]; then
   echo "Usage: compro-make newprojectname"
   exit 0
@@ -18,6 +28,24 @@ do
   case $OPTION in
     g)
       BRANCH="$OPTARG"
+      ;;
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
       ;;
   esac
 done

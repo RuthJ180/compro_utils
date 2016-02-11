@@ -5,8 +5,41 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
-# @TODO: Let's chown everything.
+# Help info.
+THIS="compro-fs"
+DESC="Set file permissions for a Drupal site."
+USAGE="compro-fs"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
 
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
+# @TODO: Let's chown everything.
 
 # This might be a good place to set core.filemode.
 git config core.filemode false

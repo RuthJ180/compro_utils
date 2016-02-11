@@ -5,6 +5,40 @@ set -o pipefail
 set -o nounset
 # set -o xtrace
 
+# Help info.
+THIS="compro-htrobots"
+DESC="Download appropriate .htaccess and robots.txt files for the environment."
+USAGE="compro-htrobots"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
 # Choose the env type for the files.
 if ! [ ${ENV_TYPE+_} ]; then
   echo "What kind of environment are you setting up?"
