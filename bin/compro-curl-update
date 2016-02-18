@@ -160,20 +160,44 @@ if ($nid) {
 $serialized_entity = json_encode($entity);
 
 // Post the object to the DrupalCare site.
-// u: cashew p: password we will want to change
-// csrf: Ch-e9miR8JMu3t9_4lxTeffxHtrltyrTA-K4Kc62dIY
 echo 'Sending update to drupalcare.build.commercialprogression.net';
+
+// Log in.
+$fields = array(
+  'name' => 'cashew',
+  'pass' => 'password we will want to change',
+  'form_id' => 'user_login_form',
+);
+$fields_string = '';
+foreach ($fields as $key => $value) {
+  $fields_string .= $key . '=' . urlencode($value) . '&';
+}
+rtrim($fields_string, '&');
+
+$process = curl_init('http://drupalcare.build.commercialprogression.net/user');
+curl_setopt($process, CURLOPT_TIMEOUT, 30);
+curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
+curl_setopt($process, CURLOPT_POST, count($fields));
+curl_setopt($process, CURLOPT_POSTFIELDS, $fields_string);
+$login = curl_exec($process);
+
+// Fetch a new CSRF token.
+curl_setopt($process, CURLOPT_URL, 'http://drupalcare.build.commercialprogression.net/rest/session/token');
+$csrf_token = curl_exec($process);
+curl_close($process);
+
+// Perform the actual request.
 $process = curl_init('http://drupalcare.build.commercialprogression.net/entity/component?_format=hal_json');
+curl_setopt($process, CURLOPT_HEADER, 1);
+curl_setopt($process, CURLOPT_TIMEOUT, 30);
+curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
+curl_setopt($process, CURLOPT_USERPWD, $fields['name'] . ':' . $fields['pass']);
 curl_setopt($process, CURLOPT_HTTPHEADER, array(
   'Content-Type: application/hal+json',
   'Accept: application/json',
-  'X-CSRF-Token: Ch-e9miR8JMu3t9_4lxTeffxHtrltyrTA-K4Kc62dIY'
+  'X-CSRF-Token: ' . $csrf_token,
 ));
-curl_setopt($process, CURLOPT_HEADER, 1);
-curl_setopt($process, CURLOPT_USERPWD, "cashew:password we will want to change");
-curl_setopt($process, CURLOPT_TIMEOUT, 30);
 curl_setopt($process, CURLOPT_POST, 1);
 curl_setopt($process, CURLOPT_POSTFIELDS, $serialized_entity);
-curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
 $return = curl_exec($process);
 curl_close($process);
