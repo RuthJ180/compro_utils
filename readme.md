@@ -68,6 +68,7 @@ Create/push a bitbucket repo. Prompts if defaults aren't set in ~/.compro.
 #### Flags
 
 **h** Get help info
+**r** Specify a remote other than origin
 
 ### compro-branches
 
