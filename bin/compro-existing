@@ -94,16 +94,9 @@ if [ ${#ALIAS} == 0 ]; then
 fi
 
 # Sync from a chosen alias
-WHICHDRUSH=$(which drush6)
-if [ ${#WHICHDRUSH} -gt 6 ]; then
-  echo "Syncing database and files using drush 6"
-  drush6 sql-sync ${ALIAS} default
-  drush6 rsync ${ALIAS}:%files default:%files
-else
-  echo "Syncing database and files using system-wide drush"
-  drush sql-sync ${ALIAS} default
-  drush rsync ${ALIAS}:%files default:%files
-fi
+echo "Syncing database and files using drush."
+drush6 sql-sync ${ALIAS} default
+drush6 rsync ${ALIAS}:%files default:%files
 
 # Flush the caches
 drush cc all
