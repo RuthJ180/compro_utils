@@ -55,12 +55,6 @@ fi
 drush sql-sync -y ${ALIAS} default
 drush -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
 
-# Update Drupal db
-drush updatedb -y
-
-# Revert features
-drush fra -y
-
 # Flush the caches
 drush cc all
 
