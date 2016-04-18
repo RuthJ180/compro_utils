@@ -13,8 +13,10 @@ ini_set('xdebug.max_nesting_level', 200);
 $cmd_name = 'compro-curl-update';
 $desc = 'Send a summary of core/module updates to the drupalcare server.';
 $usage = 'compro-curl-update';
+$security_only = FALSE;
 $flags = array(
   'h' => 'Get help info',
+  's' => 'Security only updates',
 );
 
 // Handle flags.
@@ -32,13 +34,19 @@ if ($options && isset($options['h'])) {
   exit;
 }
 
+$security = getopt('s');
+if ($security && isset($security['s'])) {
+  $security_only = TRUE;
+}
+
 $title = 'Drupalcare updates: ';
 exec('echo ${PWD##*/}', $pwd);
 $pwd = $pwd[0];
 $description = '[Site: ' . $pwd . '] ';
 
 // Get the available updates from drush.
-exec('drush ups --format=php', $ups);
+$security_only ? exec('drush ups --security-only --format=php', $ups) : exec('drush ups --format=php', $ups);
+
 if (isset($ups[0])) {
   $ups = unserialize($ups[0]);
 }
