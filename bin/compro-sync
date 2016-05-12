@@ -55,10 +55,4 @@ fi
 drush sql-sync -y ${ALIAS} default
 drush -y rsync ${ALIAS}:%files default:%files || echo "Rsync failed. Probably a file permissions issue"
 
-# Flush the caches
-drush cc all
-
-# Display a login link in case that's desired by the user.
-drush uli
-
 exit 0
