@@ -119,6 +119,7 @@ Send a summary of core/module updates to the drupalcare server.
 #### Flags
 
 **h** Get help info
+**s** Security only updates
 
 ### compro-db
 
@@ -379,6 +380,8 @@ Do core and module updates using the 'build' workflow.
 
 #### Flags
 
+**b** Specify a production branch other than prod
 **h** Get help info
+**r** Specify a remote other than origin
 **s** Only do security updates
 

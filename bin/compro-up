@@ -11,7 +11,9 @@ DESC="Do core and module updates using the 'build' workflow."
 USAGE="compro-up"
 declare -A FLAGS
 FLAGS=(
+  [b]="Specify a production branch other than prod"
   [h]="Get help info"
+  [r]="Specify a remote other than origin"
   [s]="Only do security updates"
 )
 
@@ -21,16 +23,20 @@ if [ -e ~/.compro ]; then
 fi
 
 NAME=${PWD##*/}
+PROD_BRANCH="prod"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 COMMIT_MESSAGE="drush pm-update #drupalcare"
 SECURITY_ONLY=false
 UPDATES=true
+REMOTE="origin"
 
 # Allow flag to override config.
-# @TODO: Flag to allow any remote desired.
-while getopts "hs" OPTION
+while getopts "b:hr:s" OPTION
 do
   case $OPTION in
+    b)
+      PROD_BRANCH=$OPTARG
+      ;;
     h)
       echo "### ${THIS}
 
@@ -49,6 +55,9 @@ ${DESC}
       echo ""
       exit 0
       ;;
+    r)
+      REMOTE=$OPTARG
+      ;;
     s)
       SECURITY_ONLY=true
       ;;
@@ -56,16 +65,16 @@ ${DESC}
 done
 
 # Create or check out the 'build' branch
-git checkout prod || echo "Building branch from current rather than prod"
+git checkout "${PROD_BRANCH}" || echo "Building branch from current rather than prod"
 
 # Git pull from prod to ensure this shit's up to date.
-git pull origin prod || echo "Production branch not available to pull"
+git pull "${REMOTE}" "${PROD_BRANCH}" || echo "Production branch not available to pull"
 
 # Do the update stuff on a build branch.
-git checkout -b build || git checkout build && git merge prod
+git checkout -b build || git checkout build && git merge "${PROD_BRANCH}"
 
 # Pull from build if it's available? @TODO: Will this fast-forward correctly?
-git pull origin build || echo "Build is up to date, apparently"
+git pull "${REMOTE}" build || echo "Build is up to date, apparently"
 
 # Send a slack message if slack variable is set.
 if [ -n "$SLACK" ]; then
@@ -86,7 +95,7 @@ git add .
 git commit -m "${COMMIT_MESSAGE}" || UPDATES=false
 
 if [ "$UPDATES" == true ]; then
-  git push origin build
+  git push "${REMOTE}" build
   if [ -n "$SLACK" ]; then
     TEXT=":warning: Sirs and madams, $NAME has been succesfully updated, please review."
     curl -X POST --data-urlencode 'payload={"text": "'"$TEXT"'"}' $SLACK
