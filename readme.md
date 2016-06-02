@@ -385,3 +385,15 @@ Do core and module updates using the 'build' workflow.
 **r** Specify a remote other than origin
 **s** Only do security updates
 
+### compro-vagrant
+
+Download Vagrant files to the current directory
+
+#### Usage
+
+  > compro-vagrant
+
+#### Flags
+
+**h** Get help info
+

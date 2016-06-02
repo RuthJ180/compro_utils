@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# Help info.
+THIS="compro-vagrant"
+DESC="Download Vagrant files to the current directory"
+USAGE="compro-vagrant"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+)
+
+# Allow flag to override config.
+while getopts "h" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+  esac
+done
+
+# Download the three files we need.
+wget -N https://raw.githubusercontent.com/commercialprogression/compro_vagrant/master/Vagrantfile
+wget -N https://raw.githubusercontent.com/commercialprogression/compro_vagrant/master/bootstrap.sh
+wget -N https://raw.githubusercontent.com/commercialprogression/compro_vagrant/master/custom-options.sh
+
+# Display success message
+echo -e "\x1b[1;32mVagrant downloaded, usage: PHP=x.x.x vagrant up\e[0m"
+
+exit 0
