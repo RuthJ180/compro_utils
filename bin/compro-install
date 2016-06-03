@@ -13,6 +13,7 @@ declare -A FLAGS
 FLAGS=(
   [h]="Get help info"
   [u]="Override the default MYSQL user (root) for the install process"
+  [v]="Install for a Vagrant environment"
 )
 
 # This command is run from inside the site directory.
@@ -27,7 +28,7 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "hu:" OPTION
+while getopts "hvu:" OPTION
 do
   case $OPTION in
     h)
@@ -51,6 +52,8 @@ ${DESC}
     u)
       MYSQL_USER=$OPTARG
       ;;
+    v)
+      VAGRANT=true
   esac
 done
 
@@ -59,4 +62,8 @@ if ! [ ${MYSQL_PASS+_} ]; then
 fi
 
 # Install site into database using drush.
-drush site-install compro --db-url=mysql://${MYSQL_USER}:${MYSQL_PASS}@localhost/${DBNAME} --account-name=maintenance --account-pass=admin --site-name=${NAME}
+if [ "$VAGRANT" = true ]; then
+  drush site-install compro --db-url=mysql://root:root@192.168.33.10/drupal --account-name=maintenance --account-pass=admin --site-name=${NAME}
+else
+  drush site-install compro --db-url=mysql://${MYSQL_USER}:${MYSQL_PASS}@localhost/${DBNAME} --account-name=maintenance --account-pass=admin --site-name=${NAME}
+fi

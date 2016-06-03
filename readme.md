@@ -241,6 +241,7 @@ Install a drupal site using drush.
 
 **h** Get help info
 **u** Override the default MYSQL user (root) for the install process
+**v** Install for a Vagrant environment
 
 ### compro-loop
 
