@@ -279,6 +279,7 @@ Create/push a repo to external hosting. Requires settings in ~/.compro.
 
 **h** Get help info
 **o** Set the account that owns the repo on the remote service
+**p** Make the remote private
 **r** Specify a remote other than origin
 **s** Specify a remote service to use, either bitbucket.org or github.com
 **t** Provide an integer team ID for github

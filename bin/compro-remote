@@ -13,6 +13,7 @@ declare -A FLAGS
 FLAGS=(
   [h]="Get help info"
   [o]="Set the account that owns the repo on the remote service"
+  [p]="Make the remote private"
   [r]="Specify a remote other than origin"
   [s]="Specify a remote service to use, either bitbucket.org or github.com"
   [t]="Provide an integer team ID for github"
@@ -21,6 +22,7 @@ FLAGS=(
 # This command is run from inside the site directory.
 # We can use the directory name as the site name.
 NAME=${PWD##*/}
+PRIVATE=false
 REMOTE='origin'
 REMOTE_SERVICE='bitbucket.org'
 TEAMSTRING=''
@@ -31,7 +33,7 @@ if [ -e ~/.compro ]; then
 fi
 
 # Allow flag to override config.
-while getopts "ho:r:s:t:" OPTION
+while getopts "ho:pr:s:t:" OPTION
 do
   case $OPTION in
     h)
@@ -53,7 +55,12 @@ ${DESC}
       exit 0
       ;;
     o)
-      REMOTE_OWNER=${OPTARG}
+      BITBUCKET_OWNER=${OPTARG}
+      GITHUB_OWNER=${OPTARG}
+      ;;
+    p)
+      PRIVATE=true
+      # @TODO: Make this flag work.
       ;;
     r)
       REMOTE=${OPTARG}
@@ -69,11 +76,13 @@ done
 
 case ${REMOTE_SERVICE} in
   "bitbucket.org")
+    REMOTE_OWNER=${BITBUCKET_OWNER}
     # Create bitbucket repo.
     DATA='{"scm": "git", "is_private": true, "langugage": "php"}'
     echo ${DATA} | curl -v -u ${BITBUCKET_USER}:${BITBUCKET_PASS} -H "Content-Type: application/json" https://api.bitbucket.org/2.0/repositories/${REMOTE_OWNER}/${NAME} --data @-
     ;;
   "github.com")
+    REMOTE_OWNER=${GITHUB_OWNER}
     # If an org and a team ID are set, pass it along.
     GH_TEAM=''
     if [ $GITHUB_API_PREFIX == "orgs/" ] && [ $GITHUB_TEAMID -gt 1 ]; then

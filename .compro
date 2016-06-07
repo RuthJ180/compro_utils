@@ -41,16 +41,14 @@ SLACK=''
 # Bitbucket user info
 BITBUCKET_USER="username"
 BITBUCKET_PASS="password"
+BITBUCKET_OWNER="alexfisher"
 
 # GitHub Application ID/Secret
 # URL prefix for orgs. Leave empty string for making user repos instead.
 GITHUB_API_PREFIX="orgs/"
-GITHUB_TOKEN="78002ab554861b7fec59156e99565f6c9699a0a5"
-# Team ID for github
+GITHUB_TOKEN="token"
 GITHUB_TEAMID="2001374"
-
-# The user/org to own the repo on the service.
-REMOTE_OWNER="commercialprogression"
+GITHUB_OWNER="commercialprogression"
 
 # Default remote service.
-REMOTE_SERVICE="github.com"
+REMOTE_SERVICE="bitbucket.org"
