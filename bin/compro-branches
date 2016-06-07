@@ -41,6 +41,7 @@ done
 
 PROJECT=${@:$OPTIND:1}
 
+# @TODO: Make this remote-agnostic by using git branch -a
 BRANCHES=( $(git ls-remote --heads git@bitbucket.org:alexfisher/${PROJECT}.git | cut -c53-) )
 BRANCH=''
 

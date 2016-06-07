@@ -100,7 +100,7 @@ compro-hosts
 compro-git
 
 if [ $BITBUCKET = 1 ]; then
-  compro-bitbucket
+  compro-remote
 fi
 
 # Finish up.
