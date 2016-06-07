@@ -57,19 +57,6 @@ Get a selectable list of drush aliases for a site.
 
 **h** Get help info
 
-### compro-bitbucket
-
-Create/push a bitbucket repo. Prompts if defaults aren't set in ~/.compro.
-
-#### Usage
-
-  > compro-bitbucket
-
-#### Flags
-
-**h** Get help info
-**r** Specify a remote other than origin
-
 ### compro-branches
 
 Get a selectable list of git branches for a repo.
@@ -279,6 +266,22 @@ Make sure things like sites/default/files and settings.php exist.
 #### Flags
 
 **h** Get help info
+
+### compro-remote
+
+Create/push a repo to external hosting. Requires settings in ~/.compro.
+
+#### Usage
+
+  > compro-remote
+
+#### Flags
+
+**h** Get help info
+**o** Set the account that owns the repo on the remote service
+**r** Specify a remote other than origin
+**s** Specify a remote service to use, either bitbucket.org or github.com
+**t** Provide an integer team ID for github
 
 ### compro-server
 

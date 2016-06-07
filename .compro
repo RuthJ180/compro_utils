@@ -2,12 +2,6 @@
 # Directory for available sites in apache (if applicable)
 APACHE_SA='/etc/apache2/sites-available'
 
-# Your bitbucket password (Be sure to set permissions on this file)
-BITBUCKET_PASS="password"
-
-# Your bitbucket username.
-BITBUCKET_USER="username"
-
 # The socket or IP:port for PHP as a fastcgi.
 FASTCGI_PASS="127.0.0.1:9000"
 
@@ -41,3 +35,22 @@ REMOTE_USER=''
 
 # Slack webhook. This is only needed for build.
 SLACK=''
+
+## compro-remote settings.
+
+# Bitbucket user info
+BITBUCKET_USER="username"
+BITBUCKET_PASS="password"
+
+# GitHub Application ID/Secret
+# URL prefix for orgs. Leave empty string for making user repos instead.
+GITHUB_API_PREFIX="orgs/"
+GITHUB_TOKEN="78002ab554861b7fec59156e99565f6c9699a0a5"
+# Team ID for github
+GITHUB_TEAMID="2001374"
+
+# The user/org to own the repo on the service.
+REMOTE_OWNER="commercialprogression"
+
+# Default remote service.
+REMOTE_SERVICE="github.com"

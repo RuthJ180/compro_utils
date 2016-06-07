@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
+
+# Help info.
+THIS="compro-remote"
+DESC="Create/push a repo to external hosting. Requires settings in ~/.compro."
+USAGE="compro-remote"
+declare -A FLAGS
+FLAGS=(
+  [h]="Get help info"
+  [o]="Set the account that owns the repo on the remote service"
+  [r]="Specify a remote other than origin"
+  [s]="Specify a remote service to use, either bitbucket.org or github.com"
+  [t]="Provide an integer team ID for github"
+)
+
+# This command is run from inside the site directory.
+# We can use the directory name as the site name.
+NAME=${PWD##*/}
+REMOTE='origin'
+REMOTE_SERVICE='bitbucket.org'
+TEAMSTRING=''
+
+# Get custom configs.
+if [ -e ~/.compro ]; then
+  source ~/.compro
+fi
+
+# Allow flag to override config.
+while getopts "ho:r:s:t:" OPTION
+do
+  case $OPTION in
+    h)
+      echo "### ${THIS}
+
+${DESC}
+
+#### Usage
+
+  > ${USAGE}
+
+#### Flags
+"
+      for i in "${!FLAGS[@]}"
+      do
+        echo "**$i** ${FLAGS[$i]}"
+      done
+      echo ""
+      exit 0
+      ;;
+    o)
+      REMOTE_OWNER=${OPTARG}
+      ;;
+    r)
+      REMOTE=${OPTARG}
+      ;;
+    s)
+      REMOTE_SERVICE=${OPTARG}
+      ;;
+    t)
+      GITHUB_TEAMID=${OPTARG}
+      ;;
+  esac
+done
+
+case ${REMOTE_SERVICE} in
+  "bitbucket.org")
+    # Create bitbucket repo.
+    DATA='{"scm": "git", "is_private": true, "langugage": "php"}'
+    echo ${DATA} | curl -v -u ${BITBUCKET_USER}:${BITBUCKET_PASS} -H "Content-Type: application/json" https://api.bitbucket.org/2.0/repositories/${REMOTE_OWNER}/${NAME} --data @-
+    ;;
+  "github.com")
+    # If an org and a team ID are set, pass it along.
+    GH_TEAM=''
+    if [ $GITHUB_API_PREFIX == "orgs/" ] && [ $GITHUB_TEAMID -gt 1 ]; then
+      GH_TEAM=', "team_id": '${GITHUB_TEAMID}
+    fi
+
+    DATA='{"name": "'${NAME}'"'${GH_TEAM}'}'
+    echo ${DATA} | curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/${GITHUB_API_PREFIX}${REMOTE_OWNER}/repos --data @-
+    ;;
+esac
+
+# Set up remote origin and make first push.
+git remote add ${REMOTE} git@${REMOTE_SERVICE}:${REMOTE_OWNER}/${NAME}.git
+git push -u ${REMOTE} --all
